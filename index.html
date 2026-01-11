@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡牌展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #fafbfc;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            background-color: white;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e6ed;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .card-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .card-type {
+            background: #4a90e2;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .card-desc {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-icon {
+            font-weight: 600;
+            color: #4a90e2;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 1.2rem;
+        }
+
+        .import-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #4a90e2;
+            color: white;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #357abd;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .filter-group {
+                flex-direction: column;
+            }
+            
+            .filter-item {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>卡牌图鉴</h1>
+            <p class="subtitle">浏览和管理你的卡牌收藏</p>
+        </header>
+
+        <div class="import-section">
+            <div class="file-input-wrapper">
+                <input type="file" id="jsonFile" accept=".json">
+                <label for="jsonFile" class="file-input-label">导入 JSON 文件</label>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="searchInput">搜索卡牌</label>
+                    <input type="text" id="searchInput" placeholder="输入卡牌名称或描述...">
+                </div>
+                <div class="filter-item">
+                    <label for="typeFilter">类型筛选</label>
+                    <select id="typeFilter">
+                        <option value="">全部类型</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="roleFilter">职业筛选</label>
+                    <select id="roleFilter">
+                        <option value="">全部职业</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="cardsContainer" class="cards-grid">
+            <div class="no-results">请导入 JSON 文件以开始浏览卡牌</div>
+        </div>
+    </div>
+
+    <script>
+        let cardsData = {};
+        let filteredCards = {};
+
+        // 文件导入处理
+        document.getElementById('jsonFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        cardsData = JSON.parse(event.target.result);
+                        initializeFilters();
+                        displayCards(cardsData);
+                    } catch (error) {
+                        alert('JSON 文件格式错误，请检查文件内容');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // 初始化筛选器
+        function initializeFilters() {
+            const typeFilter = document.getElementById('typeFilter');
+            const roleFilter = document.getElementById('roleFilter');
+            
+            // 清空现有选项
+            typeFilter.innerHTML = '<option value="">全部类型</option>';
+            roleFilter.innerHTML = '<option value="">全部职业</option>';
+
+            // 收集所有类型和职业
+            const types = new Set();
+            const roles = new Set();
+
+            Object.values(cardsData).forEach(card => {
+                if (card.type) types.add(card.type);
+                if (card.role) {
+                    card.role.forEach(role => roles.add(role));
+                }
+            });
+
+            // 添加类型选项
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                typeFilter.appendChild(option);
+            });
+
+            // 添加职业选项
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role;
+                option.textContent = role;
+                roleFilter.appendChild(option);
+            });
+        }
+
+        // 筛选功能
+        function filterCards() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const roleFilter = document.getElementById('roleFilter').value;
+
+            filteredCards = {};
+
+            Object.entries(cardsData).forEach(([key, card]) => {
+                let match = true;
+
+                // 搜索筛选
+                if (searchTerm && !card.name.toLowerCase().includes(searchTerm) && 
+                    !card.desc.toLowerCase().includes(searchTerm)) {
+                    match = false;
+                }
+
+                // 类型筛选
+                if (typeFilter && card.type !== typeFilter) {
+                    match = false;
+                }
+
+                // 职业筛选
+                if (roleFilter && (!card.role || !card.role.includes(roleFilter))) {
+                    match = false;
+                }
+
+                if (match) {
+                    filteredCards[key] = card;
+                }
+            });
+
+            displayCards(filteredCards);
+        }
+
+        // 显示卡牌
+        function displayCards(cards) {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+
+            if (Object.keys(cards).length === 0) {
+                container.innerHTML = '<div class="no-results">没有找到匹配的卡牌</div>';
+                return;
+            }
+
+            Object.entries(cards).forEach(([key, card]) => {
+                const cardElement = createCardElement(key, card);
+                container.appendChild(cardElement);
+            });
+        }
+
+        // 创建卡牌元素
+        function createCardElement(key, card) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+
+            const roles = card.role && card.role.length > 0 ? card.role.join(', ') : '通用';
+
+            cardDiv.innerHTML = `
+                <div class="card-header">
+                    <h3 class="card-name">${card.name}</h3>
+                    <span class="card-type">${card.type || '无类型'}</span>
+                </div>
+                <p class="card-desc">${card.desc}</p>
+                <div class="card-stats">
+                    ${card.ap != null ? `<div class="stat"><span class="stat-icon">⚡</span> 行动力: ${card.ap}</div>` : ''}
+                    ${card.mp != null ? `<div class="stat"><span class="stat-icon">🔮</span> 法力: ${card.mp}</div>` : ''}
+                    ${card.value != null ? `<div class="stat"><span class="stat-icon">💰</span> 价值: ${card.value}</div>` : ''}
+                    <div class="stat"><span class="stat-icon">👤</span> 职业: ${roles}</div>
+                </div>
+            `;
+
+            return cardDiv;
+        }
+
+        // 事件监听
+        document.getElementById('searchInput').addEventListener('input', filterCards);
+        document.getElementById('typeFilter').addEventListener('change', filterCards);
+        document.getElementById('roleFilter').addEventListener('change', filterCards);
+
+
+
+
+        
+    </script>
+</body>
+</html>
