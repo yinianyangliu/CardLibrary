@@ -413,7 +413,7 @@
 
             const typeTxt = CardType[c.type] || c.type || '无类型';
             const rarity = c.rarity || 'common';
-            const typeColor = CardColor[rarity] || '#999';
+            const typeColor = rarityClass[rarity] || '#999';
 
             /* 职业中文 */
             const careerTxt = (c.career || ['all'])
