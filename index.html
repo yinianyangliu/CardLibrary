@@ -349,12 +349,32 @@
         const TagColor = { ice: '#1890ff', book: '#52c41a' };
         const CareerColor = { all: '#722ed1', warrior: '#fa541c', mage: '#13c2c2' };
 
+
+        /* 动态把颜色写进 <head> */
+        function injectColorStyles() {
+            const style = document.createElement('style');
+            style.dataset.dynamic = 'true';   // 做个标记，方便以后清空
+            let css = '';
+
+            // 标签
+            Object.entries(TagColor).forEach(([key, color]) => {
+                css += `.tag-${key}::before{background:${color}!important;}`;
+            });
+            // 职业
+            Object.entries(CareerColor).forEach(([key, color]) => {
+                css += `.career-${key}::before{background:${color}!important;}`;
+            });
+
+            style.textContent = css;
+            document.head.appendChild(style);
+        }
         /* ============ 数据容器 ============ */
         let cardsData = {};
         let filteredCards = {};
 
         /* ============ 入口：读 card.json（无缓存） ============ */
         window.addEventListener('DOMContentLoaded', () => {
+            injectColorStyles();   // 动态注入颜色
             fetch(`card.json?t=${Date.now()}`)
                 .then(r => r.json())
                 .then(json => {
@@ -460,15 +480,13 @@
 
             const typeTxt = CardType[c.type] || c.type || '无类型';
             const rarity = c.rarity || 'common';
-
-            /* 职业中文 + 颜色 */
-            const careerTxt = (c.career || ['all'])
-                .map(id => `<span class="career ${CareerColor[id] || ''}">${CardCareer[id] || id}</span>`)
+            
+            const tagTxt = (c.tag || [])
+                .map(t => `<span class="tag tag-${t}">${Tag[t] || t}</span>`)
                 .join('');
 
-            /* 标签中文 + 颜色 */
-            const tagTxt = (c.tag || [])
-                .map(t => `<span class="tag ${TagColor[t] || ''}">${Tag[t] || t}</span>`)
+            const careerTxt = (c.career || ['all'])
+                .map(id => `<span class="career career-${id}">${CardCareer[id] || id}</span>`)
                 .join('');
 
             /* 统计行分组 */
