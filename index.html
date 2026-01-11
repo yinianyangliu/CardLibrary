@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -121,7 +122,6 @@
         }
 
         .card-type {
-            background: #4a90e2;
             color: #fff;
             padding: 4px 12px;
             border-radius: 20px;
@@ -137,16 +137,17 @@
 
         .card-stats {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
         }
 
         .stat {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             color: #666;
-            font-size: .9rem
         }
 
         .stat-icon {
@@ -206,29 +207,52 @@
         .legendary          { background: #E6E600; } /* 黄色 → 振动 */
         .mythic             { background: #FF4DFF; } /* 紫色 → 保留 */
 
-        /* Tag 样式：参考图片“正确/错误/剩余” */
+        /* Tag 样式：带颜色小圆点 */
         .tag {
             display: inline-flex;
             align-items: center;
-            padding: 4px 10px;
+            padding: 3px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 500;
             margin-right: 6px;
             margin-bottom: 4px;
+            background: rgba(0,0,0,.05);
+            color: #333;
         }
-        .tag.correct {
-            background: #52c41a;
-            color: #fff;
+        .tag::before{
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
         }
-        .tag.incorrect {
-            background: #ff4d4f;
-            color: #fff;
+        .tag-ice::before{ background: #1890ff; }
+        .tag-book::before{ background: #52c41a; }
+
+        /* 职业标签颜色 */
+        .career{
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 6px;
+            margin-bottom: 4px;
+            background: rgba(0,0,0,.05);
+            color: #333;
         }
-        .tag.remaining {
-            background: #faad14;
-            color: #fff;
+        .career::before{
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
         }
+        .career-all::before{ background: #722ed1; }
+        .career-warrior::before{ background: #fa541c; }
+        .career-mage::before{ background: #13c2c2; }
     </style>
 </head>
 
@@ -301,6 +325,8 @@
         };
         const CardCareer = { all: "通用", warrior: "战士" ,mage:"法师"};
         const Tag = { ice: "冰系", book: "书" };   // 以后继续往这里加
+        const TagColor = { ice: 'tag-ice', book: 'tag-book' };
+        const CareerColor = { all: 'career-all', warrior: 'career-warrior', mage: 'career-mage' };
 
         /* ============ 数据容器 ============ */
         let cardsData = {};
@@ -413,26 +439,26 @@
 
             const typeTxt = CardType[c.type] || c.type || '无类型';
             const rarity = c.rarity || 'common';
-            const typeColor = rarityClass[rarity] || '#999';
 
-            /* 职业中文 */
+            /* 职业中文 + 颜色 */
             const careerTxt = (c.career || ['all'])
-                .map(id => CardCareer[id] || id)
-                .join(', ');
-
-            /* 标签中文 + 样式 */
-            const tagTxt = (c.tag || [])
-                .map(t => `<span class="tag remaining">${Tag[t] || t}</span>`)
+                .map(id => `<span class="career ${CareerColor[id]||''}">${CardCareer[id]||id}</span>`)
                 .join('');
 
-            /* 统计行 */
-            const stats = [];
-            if (c.damage != null) stats.push(`⚔ 伤害 ${c.damage}`);
-            if (c.hit != null) stats.push(`🎯 命中 ${c.hit}`);
-            if (c.cooldown != null) stats.push(`❄ 冷却 ${c.cooldown}s`);
-            if (c.mp != null) stats.push(`🔮 法力 ${c.mp}`);
-            if (c.ap != null) stats.push(`⚡ 行动力 ${c.ap}`);
-            if (c.gold != null) stats.push(`💰 价值 ${c.gold}`);
+            /* 标签中文 + 颜色 */
+            const tagTxt = (c.tag || [])
+                .map(t => `<span class="tag ${TagColor[t]||''}">${Tag[t]||t}</span>`)
+                .join('');
+
+            /* 统计行分组 */
+            const line1 = [];
+            const line2 = [];
+            if (c.damage != null) line1.push(`⚔ 伤害 ${c.damage}`);
+            if (c.hit != null) line1.push(`🎯 命中 ${c.hit}`);
+            if (c.cooldown != null) line1.push(`❄ 冷却 ${c.cooldown}s`);
+            if (c.gold != null) line1.push(`💰 价值 ${c.gold}`);
+            if (c.mp != null) line2.push(`🔮 法力 ${c.mp}`);
+            if (c.ap != null) line2.push(`⚡ 行动力 ${c.ap}`);
 
             div.innerHTML = `
         <div class="card-header">
@@ -440,11 +466,10 @@
             <span class="card-type ${rarityClass[rarity]}">${typeTxt}</span>
         </div>
         <p class="card-desc">${c.desc}</p>
-        ${tagTxt ? `<p class="card-tags">🏷 标签：${tagTxt}</p>` : ''}
-        <div class="card-stats">
-            ${stats.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}
-            <div class="stat"><span class="stat-icon">👤</span> 职业：${careerTxt}</div>
-        </div>`;
+        ${tagTxt ? `<div class="card-line">${tagTxt}</div>` : ''}
+        ${line1.length ? `<div class="card-stats">${line1.map(s=>`<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
+        ${line2.length ? `<div class="card-stats">${line2.map(s=>`<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
+        ${careerTxt ? `<div class="card-line">${careerTxt}</div>` : ''}`;
             return div;
         }
 
