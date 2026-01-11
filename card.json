@@ -1,1 +1,20 @@
-{}
+{
+    "testcard": {
+        "name": "测试卡牌",
+        "desc": "测试效果",
+        "type": "attack",
+        "rarity": "common",
+        "gold": 4,
+        "damage": 10,
+        "hit": 80,
+        "cooldown": 1.5,
+        "mp": 10,
+        "ap": 5,
+        "career": [
+            "warrior"
+        ],
+        "data": {
+            "amount1": 2
+        }
+    }
+}
