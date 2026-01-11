@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>卡牌展示</title>
     <style>
-        /* ===== 样式保持原样，仅把 .import-section 隐藏 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-            background: #f5f7fa;
+            background: #ffffff;
             color: #333;
             line-height: 1.6
         }
@@ -199,6 +197,38 @@
         .checkbox-group input {
             margin-right: 4px;
         }
+
+        /* 稀有度颜色：按“运动分类挑战”图片配色 */
+        .rarity-common      { background: #C7C7C7; } /* 灰色 → 平移 */
+        .rarity-special     { background: #4DFFFF; } /* 亮青 → 旋转 */
+        .rare               { background: #3B8BFF; } /* 亮蓝 → 滚动 */
+        .epic               { background: #FF8A00; } /* 橙色 → 摆动 */
+        .legendary          { background: #E6E600; } /* 黄色 → 振动 */
+        .mythic             { background: #FF4DFF; } /* 紫色 → 保留 */
+
+        /* Tag 样式：参考图片“正确/错误/剩余” */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+        .tag.correct {
+            background: #52c41a;
+            color: #fff;
+        }
+        .tag.incorrect {
+            background: #ff4d4f;
+            color: #fff;
+        }
+        .tag.remaining {
+            background: #faad14;
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -260,9 +290,14 @@
             common: "普通", special: "特殊", exclusive: "专属", rare: "罕见",
             epic: "史诗", legendary: "传说", mythic: "神话"
         };
-        const CardColor = {
-            common: "#C7C7C7", special: "#4DFFFF", exclusive: "#10FF10",
-            rare: "#3B8BFF", epic: "#FF8A00", legendary: "#E6E600", mythic: "#FF4DFF"
+        /* 按运动方式配色，CSS 对应 class */
+        const rarityClass = {
+            common: "rarity-common",
+            special: "rarity-special",
+            rare: "rare",
+            epic: "epic",
+            legendary: "legendary",
+            mythic: "mythic"
         };
         const CardCareer = { all: "通用", warrior: "战士" ,mage:"法师"};
         const Tag = { ice: "冰系", book: "书" };   // 以后继续往这里加
@@ -385,10 +420,10 @@
                 .map(id => CardCareer[id] || id)
                 .join(', ');
 
-            /* 标签中文 */
+            /* 标签中文 + 样式 */
             const tagTxt = (c.tag || [])
-                .map(t => Tag[t] || t)
-                .join(', ');
+                .map(t => `<span class="tag remaining">${Tag[t] || t}</span>`)
+                .join('');
 
             /* 统计行 */
             const stats = [];
@@ -402,7 +437,7 @@
             div.innerHTML = `
         <div class="card-header">
             <h3 class="card-name">${c.name}</h3>
-            <span class="card-type" style="background:${typeColor}">${typeTxt}</span>
+            <span class="card-type ${rarityClass[rarity]}">${typeTxt}</span>
         </div>
         <p class="card-desc">${c.desc}</p>
         ${tagTxt ? `<p class="card-tags">🏷 标签：${tagTxt}</p>` : ''}
@@ -419,5 +454,4 @@
         document.getElementById('roleFilter').addEventListener('change', filterCards);
     </script>
 </body>
-
 </html>
