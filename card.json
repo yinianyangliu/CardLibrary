@@ -12,7 +12,8 @@
         "ap": 5,
         "tag":["ice","book"],
         "career": [
-            "warrior"
+            "warrior",
+            "mage"
         ],
         "data": {
             "amount1": 2
