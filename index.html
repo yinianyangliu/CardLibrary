@@ -480,7 +480,7 @@
 
             const typeTxt = CardType[c.type] || c.type || '无类型';
             const rarity = c.rarity || 'common';
-            
+
             const tagTxt = (c.tag || [])
                 .map(t => `<span class="tag tag-${t}">${Tag[t] || t}</span>`)
                 .join('');
@@ -504,11 +504,14 @@
             <h3 class="card-name">${c.name}</h3>
             <span class="card-type ${rarityClass[rarity]}">${typeTxt}</span>
         </div>
+        <div>描述：</div>
         <p class="card-desc">${c.desc}</p>
-        ${tagTxt ? `<div class="card-line">${tagTxt}</div>` : ''}
+        <div>属性：</div>
         ${line1.length ? `<div class="card-stats">${line1.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
+        <div>消耗：</div>
         ${line2.length ? `<div class="card-stats">${line2.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
-        ${careerTxt ? `<div class="card-line">${careerTxt}</div>` : ''}`;
+        <div>标签：</div>${tagTxt ? `<div class="card-line">${tagTxt}</div>` : ''}
+         <div>职业：</div>${careerTxt ? `<div class="card-line">${careerTxt}</div>` : ''}`;
             return div;
         }
 
