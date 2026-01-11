@@ -16,5 +16,33 @@
         "data": {
             "amount1": 2
         }
+    },
+    "acorn_collar": {
+        "name": "橡子颈圈",
+        "desc": "每有一点幸运，星星的物品暴击率增加5%。",
+        "gold": 8,
+        "type": "ranger",
+        "rarity": "epic"
+    },
+    "amulet_of_alchemy": {
+        "name": "炼金护符",
+        "desc": "- 战斗开始时：获得3层随机增益效果。\n- 星星的魔药被消耗时：在2.5秒后，有70%的几率触发被消耗魔药的效果。",
+        "gold": 6,
+        "type": "universal",
+        "rarity": "rare"
+    },
+    "amulet_of_darkness": {
+        "name": "黑暗护符",
+        "desc": "- 造成22点效果伤害后：向对手施加一层随机减益效果。\n- 星星效果的物品激活时：有30%的几率造成7点效果伤害。",
+        "gold": 6,
+        "type": "universal",
+        "rarity": "rare"
+    },
+    "amulet_of_energy": {
+        "name": "能量护符",
+        "desc": "- 战斗开始时：星星的物品触发快100%，持续1s。\n- 增益效果消耗时：返回25%消耗的增益效果。",
+        "gold": 6,
+        "type": "universal",
+        "rarity": "rare"
     }
 }
