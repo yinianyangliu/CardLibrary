@@ -10,6 +10,7 @@
         "cooldown": 1.5,
         "mp": 10,
         "ap": 5,
+        "tag":["ice","book"],
         "career": [
             "warrior"
         ],
