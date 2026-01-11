@@ -200,12 +200,36 @@
         }
 
         /* 稀有度颜色：按“运动分类挑战”图片配色 */
-        .rarity-common      { background: #C7C7C7; } /* 灰色 → 平移 */
-        .rarity-special     { background: #4DFFFF; } /* 亮青 → 旋转 */
-        .rare               { background: #3B8BFF; } /* 亮蓝 → 滚动 */
-        .epic               { background: #FF8A00; } /* 橙色 → 摆动 */
-        .legendary          { background: #E6E600; } /* 黄色 → 振动 */
-        .mythic             { background: #FF4DFF; } /* 紫色 → 保留 */
+        .rarity-common {
+            background: #C7C7C7;
+        }
+
+        /* 灰色 → 平移 */
+        .rarity-special {
+            background: #4DFFFF;
+        }
+
+        /* 亮青 → 旋转 */
+        .rare {
+            background: #3B8BFF;
+        }
+
+        /* 亮蓝 → 滚动 */
+        .epic {
+            background: #FF8A00;
+        }
+
+        /* 橙色 → 摆动 */
+        .legendary {
+            background: #E6E600;
+        }
+
+        /* 黄色 → 振动 */
+        .mythic {
+            background: #FF4DFF;
+        }
+
+        /* 紫色 → 保留 */
 
         /* Tag 样式：带颜色小圆点 */
         .tag {
@@ -217,21 +241,20 @@
             font-weight: 500;
             margin-right: 6px;
             margin-bottom: 4px;
-            background: rgba(0,0,0,.05);
+            background: rgba(0, 0, 0, .05);
             color: #333;
         }
-        .tag::before{
+
+        .tag::before {
             content: '';
             width: 8px;
             height: 8px;
             border-radius: 50%;
             margin-right: 6px;
         }
-        .tag-ice::before{ background: #1890ff; }
-        .tag-book::before{ background: #52c41a; }
 
         /* 职业标签颜色 */
-        .career{
+        .career {
             display: inline-flex;
             align-items: center;
             padding: 3px 10px;
@@ -240,19 +263,17 @@
             font-weight: 500;
             margin-right: 6px;
             margin-bottom: 4px;
-            background: rgba(0,0,0,.05);
+            background: rgba(0, 0, 0, .05);
             color: #333;
         }
-        .career::before{
+
+        .career::before {
             content: '';
             width: 8px;
             height: 8px;
             border-radius: 50%;
             margin-right: 6px;
         }
-        .career-all::before{ background: #722ed1; }
-        .career-warrior::before{ background: #fa541c; }
-        .career-mage::before{ background: #13c2c2; }
     </style>
 </head>
 
@@ -323,10 +344,10 @@
             legendary: "legendary",
             mythic: "mythic"
         };
-        const CardCareer = { all: "通用", warrior: "战士" ,mage:"法师"};
+        const CardCareer = { all: "通用", warrior: "战士", mage: "法师" };
         const Tag = { ice: "冰系", book: "书" };   // 以后继续往这里加
-        const TagColor = { ice: 'tag-ice', book: 'tag-book' };
-        const CareerColor = { all: 'career-all', warrior: 'career-warrior', mage: 'career-mage' };
+        const TagColor = { ice: '#1890ff', book: '#52c41a' };
+        const CareerColor = { all: '#722ed1', warrior: '#fa541c', mage: '#13c2c2' };
 
         /* ============ 数据容器 ============ */
         let cardsData = {};
@@ -442,12 +463,12 @@
 
             /* 职业中文 + 颜色 */
             const careerTxt = (c.career || ['all'])
-                .map(id => `<span class="career ${CareerColor[id]||''}">${CardCareer[id]||id}</span>`)
+                .map(id => `<span class="career ${CareerColor[id] || ''}">${CardCareer[id] || id}</span>`)
                 .join('');
 
             /* 标签中文 + 颜色 */
             const tagTxt = (c.tag || [])
-                .map(t => `<span class="tag ${TagColor[t]||''}">${Tag[t]||t}</span>`)
+                .map(t => `<span class="tag ${TagColor[t] || ''}">${Tag[t] || t}</span>`)
                 .join('');
 
             /* 统计行分组 */
@@ -467,8 +488,8 @@
         </div>
         <p class="card-desc">${c.desc}</p>
         ${tagTxt ? `<div class="card-line">${tagTxt}</div>` : ''}
-        ${line1.length ? `<div class="card-stats">${line1.map(s=>`<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
-        ${line2.length ? `<div class="card-stats">${line2.map(s=>`<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
+        ${line1.length ? `<div class="card-stats">${line1.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
+        ${line2.length ? `<div class="card-stats">${line2.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
         ${careerTxt ? `<div class="card-line">${careerTxt}</div>` : ''}`;
             return div;
         }
@@ -479,4 +500,5 @@
         document.getElementById('roleFilter').addEventListener('change', filterCards);
     </script>
 </body>
+
 </html>
