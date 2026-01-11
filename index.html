@@ -245,7 +245,7 @@
 
         /* ============ 入口：读 card.json ============ */
         window.addEventListener('DOMContentLoaded', () => {
-            fetch('card.json')
+            fetch(`card.json?t=${Date.now()}`)        // 或者 {cache:'no-store'}
                 .then(r => r.json())
                 .then(json => {
                     cardsData = json;
