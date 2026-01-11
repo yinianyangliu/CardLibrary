@@ -44,5 +44,33 @@
         "gold": 6,
         "type": "universal",
         "rarity": "rare"
+    },
+    "amulet_of_feasting": {
+        "name": "食物护符",
+        "desc": "- 星星的食物触发快40%。\n- 购买食物时：商店刷新一个随机食物。",
+        "gold": 6,
+        "type": "universal",
+        "rarity": "rare"
+    },
+    "amulet_of_fortune": {
+        "name": "财富护符",
+        "desc": "- 基于几率触发的星星的物品获得15%触发几率加成。\n- 5秒后：获得2层你现有最多的增益效果。",
+        "gold": 6,
+        "type": "universal",
+        "rarity": "rare"
+    },
+    "amulet_of_life": {
+        "name": "生命护符",
+        "desc": "- 战斗开始时：获得20点生命值上限。\n- 你的恢复效果增强20%。",
+        "gold": 6,
+        "type": "universal",
+        "rarity": "rare"
+    },
+    "amulet_of_steel": {
+        "name": "钢之护符",
+        "desc": "- 战斗开始时：获得30点护盾。\n- 星星物品获得35点护盾时：获得一层充能。",
+        "gold": 6,
+        "type": "universal",
+        "rarity": "rare"
     }
 }
