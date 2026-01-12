@@ -95,7 +95,7 @@
         }
 
         .card {
-            background: #fff;
+            background: #ffffff;
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
@@ -274,6 +274,222 @@
             border-radius: 50%;
             margin-right: 6px;
         }
+
+
+
+
+        /* ===== 原有样式不变，仅追加浮层与 JSON 预览区 ===== */
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            padding: 24px 28px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .18);
+        }
+
+        .modal h3 {
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .modal .row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .modal .row input,
+        .modal .row textarea {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal .actions {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .modal .actions button {
+            margin-left: 8px;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal .actions .save {
+            background: #4a90e2;
+            color: #fff;
+        }
+
+        .modal .actions .cancel {
+            background: #e0e6ed;
+            color: #333;
+        }
+
+        /* JSON 预览区 */
+        .json-preview {
+            margin-top: 16px;
+        }
+
+        .json-preview label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .json-preview textarea {
+            width: 100%;
+            min-height: 300px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 13px;
+            background: #f6f8fa;
+            color: #24292e;
+            resize: vertical;
+        }
+
+
+
+        /* ===== 以下仅为新增/调整 ===== */
+        .json-preview textarea {
+            min-height: 300px
+        }
+
+        .array-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px
+        }
+
+        .array-row input {
+            flex: 1
+        }
+
+        .array-row button {
+            background: #ff4d4f;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer
+        }
+
+        .array-row button.add {
+            background: #52c41a
+        }
+
+        .obj-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px
+        }
+
+        .obj-row input:first-child {
+            flex: 1.2
+        }
+
+        .obj-row input:last-child {
+            flex: 2
+        }
+
+        .obj-row button {
+            background: #ff4d4f;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer
+        }
+
+        .obj-row button.add {
+            background: #1890ff
+        }
+
+
+
+        /* 紧凑行 */
+        .row-compact {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px
+        }
+
+        .row-compact label {
+            font-size: 13px;
+            font-weight: 500;
+            margin: 0
+        }
+
+        .row-compact input {
+            width: 80px;
+            padding: 4px 6px;
+            font-size: 13px
+        }
+
+        .row-compact select {
+            width: 100px;
+            padding: 4px 6px;
+            font-size: 13px
+        }
+
+        /* 三块维护区并排 */
+        .mini-maintain {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px
+        }
+
+        .mini-maintain section {
+            display: flex;
+            flex-direction: column
+        }
+
+        .mini-list {
+            min-height: 40px;
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            padding: 4px;
+            overflow: hidden
+        }
+
+        .mini-list .obj-row,
+        .mini-list .array-row {
+            display: flex;
+            gap: 4px;
+            margin-top: 2px
+        }
+
+        .mini-list input {
+            flex: 1;
+            padding: 2px 4px;
+            font-size: 12px
+        }
+
+        .mini-list button {
+            font-size: 11px;
+            padding: 2px 6px
+        }
     </style>
 </head>
 
@@ -284,11 +500,12 @@
             <p class="subtitle">浏览和管理你的卡牌收藏</p>
         </header>
 
-        <!-- 上传区域已隐藏，可整段删掉，这里仅隐藏保持 diff 最小 -->
+        <!-- 上传控件（仍隐藏） -->
         <div class="import-section">
             <p>（已禁用上传，默认读取仓库 card.json）</p>
         </div>
 
+        <!-- 筛选区 -->
         <div class="controls">
             <div class="filter-group">
                 <div class="filter-item">
@@ -311,7 +528,6 @@
                     <label>标签筛选（多选）</label>
                     <div id="tagFilters" class="checkbox-group"></div>
                 </div>
-
                 <div class="filter-item">
                     <label>稀有度筛选（多选）</label>
                     <div id="rarityFilters" class="checkbox-group"></div>
@@ -319,187 +535,219 @@
             </div>
         </div>
 
+        <!-- 卡牌网格 -->
         <div id="cardsContainer" class="cards-grid">
             <div class="no-results">正在加载 card.json …</div>
         </div>
-    </div>
+        <!-- ===== 编辑浮层（含 data / tag / career 可视化维护） ===== -->
+        <!-- 一页无滚动 modal -->
+        <div id="editModal" class="modal-mask">
+            <div class="modal"
+                style="max-height:100vh;display:grid;grid-template-rows:auto auto 1fr auto;gap:10px;padding:20px 24px;">
+                <!-- ① 标题 -->
+                <h3 style="margin:0;font-weight:600;color:#2c3e50;">快速编辑</h3>
 
-    <script>
-        /* ============ 字典表 ============ */
-        const CardType = {
-            attack: "攻击", equipment: "装备", magic: "法术", spell: "咒语", pet: "宠物",
-            weapon: "武器", shield: "盾牌", food: "食物", accessories: "饰品", magicbook: "魔法书",
-            armor: "护甲", potion: "药水", magicScroll: "魔法卷轴", skill: "技能", career: "职业"
-        };
-        const CardRarity = {
-            common: "普通", special: "特殊", exclusive: "专属", rare: "罕见",
-            epic: "史诗", legendary: "传说", mythic: "神话"
-        };
-        /* 按运动方式配色，CSS 对应 class */
-        const rarityClass = {
-            common: "rarity-common",
-            special: "rarity-special",
-            rare: "rare",
-            epic: "epic",
-            legendary: "legendary",
-            mythic: "mythic"
-        };
-        const CardCareer = { all: "通用", warrior: "战士", mage: "法师" };
-        const Tag = { ice: "冰系", book: "书" };   // 以后继续往这里加
-        const TagColor = { ice: '#1890ff', book: '#52c41a' };
-        const CareerColor = { all: '#722ed1', warrior: '#fa541c', mage: '#13c2c2' };
+                <!-- ② 短字段一行 -->
+                <div class="row-compact">
+                    <label>名称</label><input id="editName" placeholder="名称">
+                    <!-- 放在名称后面，伤害前面即可 -->
+                    <label>类型</label>
+                    <select id="editType"></select>
+                    <label>稀有度</label>
+                    <select id="editRarity"></select>
 
+                </div>
+                <div class="row-compact">
+                    <label>伤害</label><input id="editDamage" type="number" placeholder="伤害">
+                    <label>命中</label><input id="editHit" type="number" placeholder="命中">
+                    <label>冷却</label><input id="editCooldown" type="number" placeholder="冷却(s)">
+                    <label>价值</label><input id="editGold" type="number" placeholder="价值">
+                </div>
+                <div class="row-compact">
+                    <label>MP</label><input id="editMp" type="number" placeholder="MP">
+                    <label>AP</label><input id="editAp" type="number" placeholder="AP">
+                </div>
+                <!-- ③ 描述全宽 -->
+                <label>描述</label>
+                <textarea id="editDesc" rows="3" style="width:100%;resize:none;"></textarea>
 
-        /* 动态把颜色写进 <head> */
-        function injectColorStyles() {
-            const style = document.createElement('style');
-            style.dataset.dynamic = 'true';   // 做个标记，方便以后清空
-            let css = '';
+                <!-- ④ data / tag / career 紧凑维护区（内部再分栏） -->
+                <div class="mini-maintain">
+                    <!-- data -->
+                    <section>
+                        <label>data 对象</label>
+                        <div id="dataList" class="mini-list"></div>
+                        <button class="add" onclick="addDataKV()">+ 新增键值</button>
+                    </section>
 
-            // 标签
-            Object.entries(TagColor).forEach(([key, color]) => {
-                css += `.tag-${key}::before{background:${color}!important;}`;
-            });
-            // 职业
-            Object.entries(CareerColor).forEach(([key, color]) => {
-                css += `.career-${key}::before{background:${color}!important;}`;
-            });
+                    <!-- tag -->
+                    <section>
+                        <label>tag 数组</label>
+                        <div id="tagList" class="mini-list"></div>
+                        <button class="add" onclick="addTagItem()">+ 添加 tag</button>
+                    </section>
 
-            style.textContent = css;
-            document.head.appendChild(style);
-        }
-        /* ============ 数据容器 ============ */
-        let cardsData = {};
-        let filteredCards = {};
+                    <!-- career -->
+                    <section>
+                        <label>career 数组</label>
+                        <div id="careerList" class="mini-list"></div>
+                        <button class="add" onclick="addCareerItem()">+ 添加 career</button>
+                    </section>
+                </div>
 
-        /* ============ 入口：读 card.json（无缓存） ============ */
-        window.addEventListener('DOMContentLoaded', () => {
-            injectColorStyles();   // 动态注入颜色
-            fetch(`card.json?t=${Date.now()}`)
-                .then(r => r.json())
-                .then(json => {
-                    cardsData = json;
-                    initFilters();
-                    displayCards(cardsData);
-                })
-                .catch(err => {
-                    console.error(err);
-                    document.getElementById('cardsContainer').innerHTML =
-                        '<div class="no-results">读取 card.json 失败</div>';
-                });
-        });
+                <!-- ⑤ JSON 预览 -->
+                <label>卡牌 JSON（实时预览，只读）</label>
+                <textarea id="jsonPreview" readonly style="width:100%;min-height:300px;font-size:12px;"></textarea>
 
-        /* ============ 初始化下拉 & 多选 ============ */
-        function initFilters() {
-            /* ---- 类型下拉 ---- */
-            const typeFilter = document.getElementById('typeFilter');
-            typeFilter.innerHTML = '<option value="">全部类型</option>';
-            const types = [...new Set(Object.values(cardsData).map(c => c.type).filter(Boolean))];
-            types.forEach(t => {
-                const o = document.createElement('option');
-                o.value = t;
-                o.textContent = CardType[t] || t;
-                typeFilter.appendChild(o);
-            });
-
-            /* ---- 职业下拉 ---- */
-            const roleFilter = document.getElementById('roleFilter');
-            roleFilter.innerHTML = '<option value="">全部职业</option>';
-            const roles = [...new Set(Object.values(cardsData).flatMap(c => c.career || ['all']))];
-            roles.forEach(r => {
-                const o = document.createElement('option');
-                o.value = r;
-                o.textContent = CardCareer[r] || r;
-                roleFilter.appendChild(o);
+                <!-- ⑥ 按钮 -->
+                <div class="actions" style="text-align:right;">
+                    <button class="cancel" onclick="closeEdit()">取消</button>
+                    <button class="save" onclick="saveEdit()">保存</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            /* ============ 入口：读 card.json（无缓存） ============ */
+            window.addEventListener('DOMContentLoaded', () => {
+                injectColorStyles();   // 动态注入颜色
+                fetch(`card.json?t=${Date.now()}`)
+                    .then(r => r.json())
+                    .then(json => {
+                        cardsData = json;
+                        initFilters();
+                        displayCards(cardsData);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        document.getElementById('cardsContainer').innerHTML =
+                            '<div class="no-results">读取 card.json 失败</div>';
+                    });
             });
 
-            /* ---- 标签多选 ---- */
-            const tagBox = document.getElementById('tagFilters');
-            const allTags = [...new Set(Object.values(cardsData).flatMap(c => c.tag || []))];
-            allTags.forEach(t => {
-                const label = document.createElement('label');
-                label.innerHTML = `<input type="checkbox" value="${t}" onchange="filterCards()"> ${Tag[t] || t}`;
-                tagBox.appendChild(label);
-            });
 
-            /* ---- 稀有度多选 ---- */
-            const rarityBox = document.getElementById('rarityFilters');
-            Object.keys(CardRarity).forEach(r => {
-                const label = document.createElement('label');
-                label.innerHTML = `<input type="checkbox" value="${r}" onchange="filterCards()"> ${CardRarity[r]}`;
-                rarityBox.appendChild(label);
-            });
-        }
-
-        /* ============ 筛选逻辑 ============ */
-        function filterCards() {
-            const search = document.getElementById('searchInput').value.trim().toLowerCase();
-            const typeF = document.getElementById('typeFilter').value;
-            const roleF = document.getElementById('roleFilter').value;
-
-            /* 收集选中的标签 */
-            const checkedTags = [...document.querySelectorAll('#tagFilters input:checked')].map(i => i.value);
-            /* 收集选中的稀有度 */
-            const checkedRarities = [...document.querySelectorAll('#rarityFilters input:checked')].map(i => i.value);
-
-            filteredCards = {};
-            Object.entries(cardsData).forEach(([k, c]) => {
-                if (search && !c.name.toLowerCase().includes(search) && !c.desc.toLowerCase().includes(search)) return;
-                if (typeF && c.type !== typeF) return;
-                if (roleF && (!c.career || !c.career.includes(roleF))) return;
-
-                /* 标签多选：勾选时至少命中一个即可（交集） */
-                if (checkedTags.length) {
-                    const cardTags = c.tag || [];
-                    if (!checkedTags.some(t => cardTags.includes(t))) return;
-                }
-                /* 稀有度多选 */
-                if (checkedRarities.length) {
-                    if (!checkedRarities.includes(c.rarity || 'common')) return;
-                }
-
-                filteredCards[k] = c;
-            });
-            displayCards(filteredCards);
-        }
-
-        /* ============ 渲染 ============ */
-        function displayCards(cards) {
-            const box = document.getElementById('cardsContainer');
-            box.innerHTML = '';
-            if (Object.keys(cards).length === 0) {
-                box.innerHTML = '<div class="no-results">没有找到匹配的卡牌</div>';
-                return;
+            /* ============ 实时预览：统一监听所有控件 ============ */
+            /* 把表单当前值刷回数据并更新预览 */
+            function flushFormToData() {
+                if (!editingKey) return;
+                const c = cardsData[editingKey];
+                c.name = document.getElementById('editName').value.trim() || c.name;
+                c.desc = document.getElementById('editDesc').value.trim() || c.desc;
+                c.damage = toNum(document.getElementById('editDamage').value);
+                c.hit = toNum(document.getElementById('editHit').value);
+                c.cooldown = toNum(document.getElementById('editCooldown').value);
+                c.gold = toNum(document.getElementById('editGold').value);
+                c.mp = toNum(document.getElementById('editMp').value);
+                c.ap = toNum(document.getElementById('editAp').value);
+                c.type = document.getElementById('editType').value;
+                c.rarity = document.getElementById('editRarity').value;
+                syncJsonPreview();
             }
-            Object.entries(cards).forEach(([k, c]) => box.appendChild(createCard(k, c)));
-        }
 
-        function createCard(key, c) {
-            const div = document.createElement('div');
-            div.className = 'card';
+            /* 给 modal 里所有表单元素绑统一监听 */
+            function bindLivePreview() {
+                const root = document.querySelector('#editModal');
+                // 文本/数字框、下拉框
+                root.querySelectorAll('input, textarea, select').forEach(el => {
+                    el.oninput = el.onchange = flushFormToData;
+                });
+            }
 
-            const typeTxt = CardType[c.type] || c.type || '无类型';
-            const rarity = c.rarity || 'common';
+            /* 在打开弹窗时绑一次即可 */
+            const originalEditCard = editCard;
+            editCard = function (key) {
+                originalEditCard(key);
+                bindLivePreview();   // 关键：绑定实时刷新
+            };
+            /* ============ 原有字典表 ============ */
+            const CardType = { attack: "攻击", equipment: "装备", magic: "法术", spell: "咒语", pet: "宠物", weapon: "武器", shield: "盾牌", food: "食物", accessories: "饰品", magicbook: "魔法书", armor: "护甲", potion: "药水", magicScroll: "魔法卷轴", skill: "技能", career: "职业" };
+            const CardRarity = { common: "普通", special: "特殊", exclusive: "专属", rare: "罕见", epic: "史诗", legendary: "传说", mythic: "神话" };
+            const rarityClass = { common: "rarity-common", special: "rarity-special", rare: "rare", epic: "epic", legendary: "legendary", mythic: "mythic" };
+            const CardCareer = { all: "通用", warrior: "战士", mage: "法师" };
+            const Tag = { ice: "冰系", book: "书", fire: "火系" };
+            const TagColor = { ice: '#1890ff', book: '#52c41a', fire: '#ff4d4f' };
+            const CareerColor = { all: '#722ed1', warrior: '#fa541c', mage: '#13c2c2' };
 
-            const tagTxt = (c.tag || [])
-                .map(t => `<span class="tag tag-${t}">${Tag[t] || t}</span>`)
-                .join('');
+            function injectColorStyles() {
+                const style = document.createElement('style');
+                style.dataset.dynamic = 'true';
+                let css = '';
+                Object.entries(TagColor).forEach(([k, c]) => css += `.tag-${k}::before{background:${c}!important;}`);
+                Object.entries(CareerColor).forEach(([k, c]) => css += `.career-${k}::before{background:${c}!important;}`);
+                style.textContent = css;
+                document.head.appendChild(style);
+            }
 
-            const careerTxt = (c.career || ['all'])
-                .map(id => `<span class="career career-${id}">${CardCareer[id] || id}</span>`)
-                .join('');
+            /* ============ 数据容器 ============ */
+            let cardsData = {}, filteredCards = {};
+            let editingKey = null;
 
-            /* 统计行分组 */
-            const line1 = [];
-            const line2 = [];
-            if (c.damage != null) line1.push(`⚔ 伤害 ${c.damage}`);
-            if (c.hit != null) line1.push(`🎯 命中 ${c.hit}`);
-            if (c.cooldown != null) line1.push(`❄ 冷却 ${c.cooldown}s`);
-            if (c.gold != null) line1.push(`💰 价值 ${c.gold}`);
-            if (c.mp != null) line2.push(`🔮 法力 ${c.mp}`);
-            if (c.ap != null) line2.push(`⚡ 行动力 ${c.ap}`);
 
-            div.innerHTML = `
+
+            /* ============ 初始化筛选 ============ */
+            function initFilters() {
+                const typeFilter = document.getElementById('typeFilter');
+                typeFilter.innerHTML = '<option value="">全部类型</option>';
+                [...new Set(Object.values(cardsData).map(c => c.type).filter(Boolean))].forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = CardType[t] || t; typeFilter.appendChild(o); });
+
+                const roleFilter = document.getElementById('roleFilter');
+                roleFilter.innerHTML = '<option value="">全部职业</option>';
+                [...new Set(Object.values(cardsData).flatMap(c => c.career || ['all']))].forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = CardCareer[r] || r; roleFilter.appendChild(o); });
+
+                const tagBox = document.getElementById('tagFilters');
+                [...new Set(Object.values(cardsData).flatMap(c => c.tag || []))].forEach(t => { const label = document.createElement('label'); label.innerHTML = `<input type="checkbox" value="${t}" onchange="filterCards()"> ${Tag[t] || t}`; tagBox.appendChild(label); });
+
+                const rarityBox = document.getElementById('rarityFilters');
+                Object.keys(CardRarity).forEach(r => { const label = document.createElement('label'); label.innerHTML = `<input type="checkbox" value="${r}" onchange="filterCards()"> ${CardRarity[r]}`; rarityBox.appendChild(label); });
+            }
+
+            /* ============ 筛选逻辑 ============ */
+            function filterCards() {
+                const search = document.getElementById('searchInput').value.trim().toLowerCase();
+                const typeF = document.getElementById('typeFilter').value;
+                const roleF = document.getElementById('roleFilter').value;
+                const checkedTags = [...document.querySelectorAll('#tagFilters input:checked')].map(i => i.value);
+                const checkedRarities = [...document.querySelectorAll('#rarityFilters input:checked')].map(i => i.value);
+
+                filteredCards = {};
+                Object.entries(cardsData).forEach(([k, c]) => {
+                    if (search && !c.name.toLowerCase().includes(search) && !c.desc.toLowerCase().includes(search)) return;
+                    if (typeF && c.type !== typeF) return;
+                    if (roleF && (!c.career || !c.career.includes(roleF))) return;
+                    if (checkedTags.length && !checkedTags.some(t => (c.tag || []).includes(t))) return;
+                    if (checkedRarities.length && !checkedRarities.includes(c.rarity || 'common')) return;
+                    filteredCards[k] = c;
+                });
+                displayCards(filteredCards);
+            }
+
+            /* ============ 渲染卡牌 ============ */
+            function displayCards(cards) {
+                const box = document.getElementById('cardsContainer');
+                box.innerHTML = '';
+                if (Object.keys(cards).length === 0) { box.innerHTML = '<div class="no-results">没有找到匹配的卡牌</div>'; return; }
+                Object.entries(cards).forEach(([k, c]) => box.appendChild(createCard(k, c)));
+            }
+            function createCard(key, c) {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.cursor = 'pointer';
+                div.onclick = () => editCard(key);
+
+                const typeTxt = CardType[c.type] || c.type || '无类型';
+                const rarity = c.rarity || 'common';
+                const tagTxt = (c.tag || []).map(t => `<span class="tag tag-${t}">${Tag[t] || t}</span>`).join('');
+                const careerTxt = (c.career || ['all']).map(id => `<span class="career career-${id}">${CardCareer[id] || id}</span>`).join('');
+
+                const line1 = [];
+                const line2 = [];
+                if (c.damage != null) line1.push(`⚔ 伤害 ${c.damage}`);
+                if (c.hit != null) line1.push(`🎯 命中 ${c.hit}`);
+                if (c.cooldown != null) line1.push(`❄ 冷却 ${c.cooldown}s`);
+                if (c.gold != null) line1.push(`💰 价值 ${c.gold}`);
+                if (c.mp != null) line2.push(`🔮 MP ${c.mp}`);
+                if (c.ap != null) line2.push(`⚡ AP ${c.ap}`);
+
+                div.innerHTML = `
         <div class="card-header">
             <h3 class="card-name">${c.name}</h3>
             <span class="card-type ${rarityClass[rarity]}">${typeTxt}</span>
@@ -511,15 +759,190 @@
         <div>消耗：</div>
         ${line2.length ? `<div class="card-stats">${line2.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
         <div>标签：</div>${tagTxt ? `<div class="card-line">${tagTxt}</div>` : ''}
-         <div>职业：</div>${careerTxt ? `<div class="card-line">${careerTxt}</div>` : ''}`;
-            return div;
-        }
+        <strong>职业</strong>${careerTxt ? `<div class="card-line">${careerTxt}</div>` : ''}`;
+                return div;
+            }
 
-        /* ============ 事件绑定 ============ */
-        document.getElementById('searchInput').addEventListener('input', filterCards);
-        document.getElementById('typeFilter').addEventListener('change', filterCards);
-        document.getElementById('roleFilter').addEventListener('change', filterCards);
-    </script>
+            /* ============================== */
+            /* =====  以下为新管理逻辑  ====== */
+            /* ============================== */
+
+            /* ---------- data 对象 ---------- */
+            function renderDataList() {
+                const box = document.getElementById('dataList');
+                box.innerHTML = '';
+                const data = cardsData[editingKey].data || {};
+                Object.entries(data).forEach(([k, v]) => {
+                    const row = document.createElement('div');
+                    row.className = 'obj-row';
+                    row.innerHTML = `
+            <input placeholder="key" value="${k}" onchange="changeDataKey('${k}',this.value)">
+            <input placeholder="value" value="${v}" onchange="changeDataVal('${k}',this.value)">
+            <button onclick="delDataKV('${k}')">删除</button>`;
+                    box.appendChild(row);
+                });
+            }
+            function addDataKV() {
+                const data = cardsData[editingKey].data ||= {};
+                let newKey = 'amount';
+                let cnt = 0;
+                while (newKey in data) { newKey = 'amount' + (++cnt); }  // 防重键
+                data[newKey] = '';
+                renderDataList();
+                syncJsonPreview();
+            }
+            function delDataKV(key) {
+                delete cardsData[editingKey].data[key];
+                renderDataList();
+                syncJsonPreview();
+            }
+            function changeDataKey(oldKey, newKey) {
+                const data = cardsData[editingKey].data;
+                if (newKey === '' || newKey === oldKey) return;
+                if (newKey in data) { alert('键已存在'); renderDataList(); return; }
+                data[newKey] = data[oldKey];
+                delete data[oldKey];
+                renderDataList();
+                syncJsonPreview();
+            }
+            function changeDataVal(key, val) {
+                cardsData[editingKey].data[key] = val;
+                syncJsonPreview();
+            }
+
+            /* ---------- tag 数组 ---------- */
+            function renderTagList() {
+                const box = document.getElementById('tagList');
+                box.innerHTML = '';
+                const arr = cardsData[editingKey].tag || [];
+                arr.forEach((v, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'array-row';
+                    row.innerHTML = `
+            <input value="${v}" onchange="changeTagItem(${idx},this.value)">
+            <button onclick="delTagItem(${idx})">删除</button>`;
+                    box.appendChild(row);
+                });
+            }
+            function addTagItem() {
+                const arr = cardsData[editingKey].tag ||= [];
+                arr.push('newTag');
+                renderTagList();
+                syncJsonPreview();
+            }
+            function delTagItem(idx) {
+                cardsData[editingKey].tag.splice(idx, 1);
+                renderTagList();
+                syncJsonPreview();
+            }
+            function changeTagItem(idx, val) {
+                cardsData[editingKey].tag[idx] = val;
+                syncJsonPreview();
+            }
+
+            /* ---------- career 数组 ---------- */
+            function renderCareerList() {
+                const box = document.getElementById('careerList');
+                box.innerHTML = '';
+                const arr = cardsData[editingKey].career || [];
+                arr.forEach((v, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'array-row';
+                    row.innerHTML = `
+            <input value="${v}" onchange="changeCareerItem(${idx},this.value)">
+            <button onclick="delCareerItem(${idx})">删除</button>`;
+                    box.appendChild(row);
+                });
+            }
+            function addCareerItem() {
+                const arr = cardsData[editingKey].career ||= [];
+                arr.push('all');
+                renderCareerList();
+                syncJsonPreview();
+            }
+            function delCareerItem(idx) {
+                cardsData[editingKey].career.splice(idx, 1);
+                renderCareerList();
+                syncJsonPreview();
+            }
+            function changeCareerItem(idx, val) {
+                cardsData[editingKey].career[idx] = val;
+                syncJsonPreview();
+            }
+
+            /* ---------- 打开 / 关闭弹窗 ---------- */
+            /* 通用下拉框生成 */
+            function initSelect(domId, dict, current) {
+                const sel = document.getElementById(domId);
+                sel.innerHTML = '';                       // 清空
+                Object.entries(dict).forEach(([k, v]) => {
+                    const opt = document.createElement('option');
+                    opt.value = k;
+                    opt.textContent = v;
+                    if (k === current) opt.selected = true;
+                    sel.appendChild(opt);
+                });
+            }
+            function editCard(key) {
+
+                editingKey = key;
+                fillForm();
+                renderDataList();
+                renderTagList();
+                renderCareerList();
+                syncJsonPreview();
+                /* —— 新增：初始化 type / rarity —— */
+                initSelect('editType', CardType, cardsData[key].type || 'attack');
+                initSelect('editRarity', CardRarity, cardsData[key].rarity || 'common');
+                document.getElementById('editModal').style.display = 'flex';
+            }
+            function closeEdit() {
+                document.getElementById('editModal').style.display = 'none';
+                editingKey = null;
+            }
+            function saveEdit() {
+                if (!editingKey) return;
+                const c = cardsData[editingKey];
+                c.name = document.getElementById('editName').value.trim() || c.name;
+                c.desc = document.getElementById('editDesc').value.trim() || c.desc;
+                c.damage = toNum(document.getElementById('editDamage').value);
+                c.hit = toNum(document.getElementById('editHit').value);
+                c.cooldown = toNum(document.getElementById('editCooldown').value);
+                c.gold = toNum(document.getElementById('editGold').value);
+                c.mp = toNum(document.getElementById('editMp').value);
+                c.ap = toNum(document.getElementById('editAp').value);
+                /* 新增两行 */
+                c.type = document.getElementById('editType').value;
+                c.rarity = document.getElementById('editRarity').value;
+                closeEdit();
+                filterCards();
+            }
+            function toNum(v) { return v === '' ? undefined : Number(v); }
+
+            /* ---------- JSON 实时预览 ---------- */
+            function syncJsonPreview() {
+                if (!editingKey) return;
+                document.getElementById('jsonPreview').value = JSON.stringify(cardsData[editingKey], null, 2);
+            }
+            function fillForm() {
+                const c = cardsData[editingKey];
+                document.getElementById('editName').value = c.name;
+                document.getElementById('editDesc').value = c.desc;
+                document.getElementById('editDamage').value = c.damage ?? '';
+                document.getElementById('editHit').value = c.hit ?? '';
+                document.getElementById('editCooldown').value = c.cooldown ?? '';
+                document.getElementById('editGold').value = c.gold ?? '';
+                document.getElementById('editMp').value = c.mp ?? '';
+                document.getElementById('editAp').value = c.ap ?? '';
+            }
+
+            /* ============ 事件绑定（保持原样） ============ */
+            document.getElementById('searchInput').addEventListener('input', filterCards);
+            document.getElementById('typeFilter').addEventListener('change', filterCards);
+            document.getElementById('roleFilter').addEventListener('change', filterCards);
+
+
+        </script>
 </body>
 
 </html>
