@@ -4,945 +4,3222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>卡牌展示</title>
+    <title>卡牌图鉴编辑器 | Card Codex Pro</title>
     <style>
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --card-bg: rgba(20, 20, 30, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+            --glow-red: rgba(255, 0, 85, 0.5);
+            --glow-green: rgba(0, 255, 136, 0.5);
+            --glow-blue: rgba(0, 136, 255, 0.5);
+            --glow-gold: rgba(255, 215, 0, 0.5);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-            background: #ffffff;
-            color: #333;
-            line-height: 1.6
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px
+        /* 动态背景 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(255, 0, 85, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 136, 255, 0.08) 0%, transparent 50%);
+            animation: bgPulse 10s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         header {
+            position: relative;
+            z-index: 10;
             text-align: center;
-            margin-bottom: 40px;
-            padding: 20px 0
+            padding: 2rem 1rem;
         }
 
         h1 {
-            font-size: 2.5rem;
-            color: #2c3e50;
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 300;
-            margin-bottom: 10px
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #ff0055, #00ff88, #0088ff, #ff0055);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 5s linear infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 85, 0.5));
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 300% 50%;
+            }
         }
 
         .subtitle {
-            color: #7f8c8d;
-            font-size: 1.1rem
-        }
-
-        .controls {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-            margin-bottom: 30px
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: center
-        }
-
-        .filter-item {
-            flex: 1;
-            min-width: 200px
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 2px solid #e0e6ed;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all .3s ease;
-            background: #fafbfc
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: #4a90e2;
-            background: #fff
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px
-        }
-
-        .card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-            transition: all .3s ease;
-            border: 1px solid #e0e6ed
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, .12)
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px
-        }
-
-        .card-name {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2c3e50
-        }
-
-        .card-type {
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: .85rem;
-            font-weight: 500
-        }
-
-        .card-desc {
-            color: #555;
-            margin-bottom: 15px;
-            line-height: 1.6
-        }
-
-        .card-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px 20px;
-            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.5rem;
             font-size: 0.9rem;
         }
 
-        .stat {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            color: #666;
-        }
-
-        .stat-icon {
-            font-weight: 600;
-            color: #4a90e2
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-            font-size: 1.2rem
-        }
-
-        /* 隐藏上传区域 */
-        .import-section {
-            display: none
-        }
-
-        @media(max-width:768px) {
-            .filter-group {
-                flex-direction: column
-            }
-
-            .filter-item {
-                width: 100%
-            }
-
-            h1 {
-                font-size: 2rem
-            }
-        }
-
-        .checkbox-group {
+        /* 工具栏 */
+        .toolbar {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto 1rem;
+            padding: 0 2rem;
             display: flex;
+            gap: 1rem;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 6px;
+            justify-content: center;
         }
 
-        .checkbox-group label {
-            display: inline-flex;
-            align-items: center;
-            font-size: 14px;
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: #fff;
             cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .checkbox-group input {
-            margin-right: 4px;
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* 稀有度颜色：按“运动分类挑战”图片配色 */
+        .btn.primary {
+            background: linear-gradient(135deg, #ff0055, #ff5500);
+            border-color: transparent;
+        }
+
+        .btn.primary:hover {
+            box-shadow: 0 5px 20px rgba(255, 0, 85, 0.4);
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #000;
+            font-weight: 600;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* 筛选栏 */
+        .filter-bar {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .filter-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-title {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-stats {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            min-width: 60px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .filter-chip {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            user-select: none;
+        }
+
+        .filter-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, var(--chip-color, #0088ff), rgba(0, 136, 255, 0.3));
+            border-color: var(--chip-color, #0088ff);
+            color: #fff;
+            font-weight: 500;
+            box-shadow: 0 0 15px var(--chip-glow, rgba(0, 136, 255, 0.3));
+        }
+
+        .filter-chip .count {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            margin-left: 0.2rem;
+        }
+
+        .clear-filters {
+            opacity: 0.8;
+            border-color: rgba(255, 0, 85, 0.3);
+            color: #ff5588;
+        }
+
+        .clear-filters:hover {
+            opacity: 1;
+            background: rgba(255, 0, 85, 0.1);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* 卡牌网格 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        /* 卡牌卡片 */
+        .card-item {
+            position: relative;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            height: 280px;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .card-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-color, #888), transparent);
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .card-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5),
+                0 0 30px var(--card-glow, rgba(255, 255, 255, 0.1));
+            border-color: var(--card-color, rgba(255, 255, 255, 0.2));
+        }
+
+        .card-item:hover::before {
+            opacity: 1;
+        }
+
+        .card-item.hidden {
+            display: none;
+        }
+
+        .card-item:hover .card-actions {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* 稀有度颜色定义 */
         .rarity-common {
-            background: #C7C7C7;
+            --card-color: #888888;
+            --card-glow: rgba(136, 136, 136, 0.5);
         }
 
-        /* 灰色 → 平移 */
         .rarity-special {
-            background: #4DFFFF;
+            --card-color: #00ff88;
+            --card-glow: rgba(0, 255, 136, 0.5);
         }
 
-        /* 亮青 → 旋转 */
-        .rare {
-            background: #3B8BFF;
+        .rarity-exclusive {
+            --card-color: #ff00ff;
+            --card-glow: rgba(255, 0, 255, 0.5);
         }
 
-        /* 亮蓝 → 滚动 */
-        .epic {
-            background: #FF8A00;
+        .rarity-rare {
+            --card-color: #0088ff;
+            --card-glow: rgba(0, 136, 255, 0.5);
         }
 
-        /* 橙色 → 摆动 */
-        .legendary {
-            background: #E6E600;
+        .rarity-epic {
+            --card-color: #aa00ff;
+            --card-glow: rgba(170, 0, 255, 0.5);
         }
 
-        /* 黄色 → 振动 */
-        .mythic {
-            background: #FF4DFF;
+        .rarity-legendary {
+            --card-color: #ffaa00;
+            --card-glow: rgba(255, 170, 0, 0.5);
         }
 
-        /* 紫色 → 保留 */
-
-        /* Tag 样式：带颜色小圆点 */
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-right: 6px;
-            margin-bottom: 4px;
-            background: rgba(0, 0, 0, .05);
-            color: #333;
+        .rarity-mythic {
+            --card-color: #ff0000;
+            --card-glow: rgba(255, 0, 0, 0.6);
         }
 
-        .tag::before {
-            content: '';
-            width: 8px;
-            height: 8px;
+        .card-icon {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            margin-right: 6px;
-        }
-
-        /* 职业标签颜色 */
-        .career {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-right: 6px;
-            margin-bottom: 4px;
-            background: rgba(0, 0, 0, .05);
-            color: #333;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            border: 2px solid var(--card-color);
+            box-shadow: 0 0 20px var(--card-glow);
+            position: relative;
+            overflow: hidden;
         }
 
-        .career::before {
+        .card-icon::after {
             content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
         }
 
+        @keyframes shine {
+            0% {
+                transform: rotate(0deg) translateX(-100%);
+            }
 
+            100% {
+                transform: rotate(360deg) translateX(100%);
+            }
+        }
 
+        .card-header {
+            text-align: center;
+            width: 100%;
+        }
 
-        /* ===== 原有样式不变，仅追加浮层与 JSON 预览区 ===== */
-        .modal-mask {
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 0.25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-type {
+            font-size: 0.75rem;
+            color: var(--card-color);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        /* 卡牌ID显示 */
+        .card-key {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-preview {
+            margin-top: auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rarity-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--card-color);
+            box-shadow: 0 0 10px var(--card-glow);
+        }
+
+        /* 神话稀有度特殊动画 */
+        .rarity-mythic .rarity-badge {
+            animation: mythicPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes mythicPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+            }
+        }
+
+        /* 操作按钮 */
+        .card-actions {
+            position: absolute;
+            top: 35px;
+            left: 10px;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            background: var(--btn-color);
+            border-color: var(--btn-color);
+            transform: scale(1.1);
+        }
+
+        .action-btn.edit {
+            --btn-color: #0088ff;
+        }
+
+        .action-btn.delete {
+            --btn-color: #ff0055;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
             position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .45);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 999;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
         }
 
         .modal {
-            background: #fff;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            padding: 24px 28px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, .18);
-        }
-
-        .modal h3 {
-            margin-bottom: 16px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .modal .row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .modal .row input,
-        .modal .row textarea {
-            flex: 1;
-            padding: 8px 12px;
-            border: 2px solid #e0e6ed;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .modal .actions {
-            text-align: right;
-            margin-top: 20px;
-        }
-
-        .modal .actions button {
-            margin-left: 8px;
-            padding: 6px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .modal .actions .save {
-            background: #4a90e2;
-            color: #fff;
-        }
-
-        .modal .actions .cancel {
-            background: #e0e6ed;
-            color: #333;
-        }
-
-        /* JSON 预览区 */
-        .json-preview {
-            margin-top: 16px;
-        }
-
-        .json-preview label {
-            display: block;
-            margin-bottom: 6px;
-            color: #555;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .json-preview textarea {
+            background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(10, 10, 15, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
             width: 100%;
-            min-height: 300px;
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            font-size: 13px;
-            background: #f6f8fa;
-            color: #24292e;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            background: linear-gradient(90deg, #ff0055, #00ff88, #0088ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 0, 85, 0.2);
+            border-color: #ff0055;
+            transform: rotate(90deg);
+        }
+
+        /* 表单样式 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #0088ff;
+            box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .form-textarea {
             resize: vertical;
+            min-height: 200px;
         }
 
-
-
-        /* ===== 以下仅为新增/调整 ===== */
-        .json-preview textarea {
-            min-height: 300px
-        }
-
-        .array-row {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px
-        }
-
-        .array-row input {
-            flex: 1
-        }
-
-        .array-row button {
-            background: #ff4d4f;
+        .form-select option {
+            background: #1a1a2e;
             color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 12px;
-            cursor: pointer
         }
 
-        .array-row button.add {
-            background: #52c41a
+        /* Key输入框特殊样式 */
+        .key-input-wrapper {
+            position: relative;
         }
 
-        .obj-row {
+        .key-input-hint {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 0.25rem;
+        }
+
+        .key-input-hint.error {
+            color: #ff0055;
+        }
+
+        .key-input-hint.success {
+            color: #00ff88;
+        }
+
+        /* 复选框组样式 */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 0.6rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .checkbox-item {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .checkbox-box {
             display: flex;
-            gap: 6px;
-            margin-top: 4px
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            user-select: none;
         }
 
-        .obj-row input:first-child {
-            flex: 1.2
+        .checkbox-item:hover .checkbox-box {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
         }
 
-        .obj-row input:last-child {
-            flex: 2
+        .checkbox-item input:checked+.checkbox-box {
+            background: linear-gradient(135deg, var(--checkbox-color, #0088ff)20, transparent);
+            border-color: var(--checkbox-color, #0088ff);
+            color: var(--checkbox-color, #fff);
+            box-shadow: 0 0 12px var(--checkbox-color, #0088ff)40;
+            font-weight: 500;
         }
 
-        .obj-row button {
-            background: #ff4d4f;
-            color: #fff;
-            border: none;
+        .checkbox-icon {
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-full {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* 悬浮提示 */
+        .tooltip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 360px;
+            min-width: 280px;
+            background: rgba(10, 10, 15, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 4px solid var(--tooltip-color, #888);
+            border-radius: 12px;
+            padding: 1.25rem;
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8),
+                0 0 30px var(--tooltip-glow, rgba(0, 0, 0, 0.5));
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tooltip-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            border: 2px solid var(--tooltip-color);
+            box-shadow: 0 0 15px var(--tooltip-glow);
+        }
+
+        .tooltip-title-group {
+            flex: 1;
+        }
+
+        .tooltip-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--tooltip-color), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tooltip-meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .rarity-tag {
+            padding: 0.15rem 0.5rem;
             border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 12px;
-            cursor: pointer
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--tooltip-color), transparent);
+            color: #fff;
+            border: 1px solid var(--tooltip-color);
         }
 
-        .obj-row button.add {
-            background: #1890ff
+        .tooltip-key {
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: auto;
         }
 
+        .tooltip-desc {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 1rem 0;
+            padding-left: 0.5rem;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+        }
 
+        .highlight {
+            color: var(--tooltip-color);
+            font-weight: bold;
+            text-shadow: 0 0 10px var(--tooltip-glow);
+        }
 
-        /* 紧凑行 */
-        .row-compact {
+        .tooltip-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--tooltip-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        .tooltip-tags {
+            margin-top: 0.75rem;
             display: flex;
             flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.35rem 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tag.career {
+            background: linear-gradient(135deg, rgba(255, 0, 85, 0.2), transparent);
+            border-color: rgba(255, 0, 85, 0.3);
+            color: #ff5588;
+        }
+
+        .tag.element {
+            background: linear-gradient(135deg, rgba(0, 136, 255, 0.2), transparent);
+            border-color: rgba(0, 136, 255, 0.3);
+            color: #55aaff;
+        }
+
+        .cooldown-indicator {
+            display: flex;
             align-items: center;
-            gap: 8px
-        }
-
-        .row-compact label {
-            font-size: 13px;
-            font-weight: 500;
-            margin: 0
-        }
-
-        .row-compact input {
-            width: 80px;
-            padding: 4px 6px;
-            font-size: 13px
-        }
-
-        .row-compact select {
-            width: 100px;
-            padding: 4px 6px;
-            font-size: 13px
-        }
-
-        /* 三块维护区并排 */
-        .mini-maintain {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px
-        }
-
-        .mini-maintain section {
-            display: flex;
-            flex-direction: column
-        }
-
-        .mini-list {
-            min-height: 40px;
-            border: 1px solid #e0e6ed;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.5rem;
+            background: rgba(0, 255, 136, 0.05);
             border-radius: 6px;
-            padding: 4px;
-            overflow: hidden
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            font-size: 0.85rem;
         }
 
-        .mini-list .obj-row,
-        .mini-list .array-row {
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.3);
+            grid-column: 1 / -1;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* 确认对话框 */
+        .confirm-dialog {
+            background: rgba(20, 20, 30, 0.95);
+            border: 1px solid rgba(255, 0, 85, 0.5);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .confirm-title {
+            font-size: 1.25rem;
+            color: #ff0055;
+            margin-bottom: 1rem;
+        }
+
+        .confirm-text {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+
+            .card-item {
+                height: 240px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 1.5rem;
+            }
+
+            .card-actions {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .filter-row {
+                align-items: flex-start;
+            }
+
+            .filter-chips {
+                width: 100%;
+            }
+
+            .filter-label {
+                min-width: auto;
+                width: 100%;
+                margin-bottom: 0.25rem;
+            }
+
+            .checkbox-group {
+                grid-template-columns: repeat(2, 1fr);
+                max-height: 240px;
+            }
+        }
+    
+        /* 键值对编辑器样式 */
+        .kv-editor {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .kv-list {
             display: flex;
-            gap: 4px;
-            margin-top: 2px
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        .mini-list input {
+        .kv-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .kv-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .kv-item input {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #fff;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .kv-item input:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .kv-item input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #0088ff;
+        }
+
+        .kv-item .kv-item-key {
             flex: 1;
-            padding: 2px 4px;
-            font-size: 12px
+            font-family: 'Courier New', monospace;
+            color: #00ff88;
         }
 
-        .mini-list button {
-            font-size: 11px;
-            padding: 2px 6px
+        .kv-item .kv-item-value {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            color: #0088ff;
         }
-    </style>
+
+        .kv-item .kv-delete {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            background: rgba(255, 0, 85, 0.1);
+            color: #ff5588;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .kv-item .kv-delete:hover {
+            background: rgba(255, 0, 85, 0.2);
+            transform: scale(1.1);
+        }
+
+        .kv-add-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .kv-add-row .kv-key {
+            flex: 1;
+        }
+
+        .kv-add-row .kv-value {
+            flex: 1;
+        }
+
+        .kv-json-preview {
+            margin-top: 0.5rem;
+        }
+
+        .kv-empty-hint {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 1rem;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .kv-add-row {
+                flex-direction: column;
+            }
+
+            .kv-add-row .kv-key,
+            .kv-add-row .kv-value {
+                width: 100%;
+            }
+
+            .kv-item {
+                flex-wrap: wrap;
+            }
+
+            .kv-item .kv-item-key,
+            .kv-item .kv-item-value {
+                flex: 1 1 40%;
+            }
+        }
+
+        /* 搜索框样式 */
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+            margin: 0 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #0088ff;
+            box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.2), 0 0 20px rgba(0, 136, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .search-clear:hover {
+            background: rgba(255, 0, 85, 0.3);
+            color: #ff5588;
+        }
+
+        /* 搜索结果高亮 */
+        .search-highlight {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1));
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .search-match {
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            font-weight: bold;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+
+        /* 搜索无结果提示 */
+        .search-no-result {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-no-result-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .search-suggestion {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                max-width: none;
+                width: 100%;
+                margin: 0.5rem 0;
+                order: 3;
+            }
+
+            .filter-header {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* 云同步状态指示器 */
+        .cloud-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: auto;
+        }
+
+        .cloud-status:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .cloud-status.connected {
+            border-color: rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.05);
+            color: #00ff88;
+        }
+
+        .cloud-status.syncing {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.05);
+            color: #ffd700;
+        }
+
+        .cloud-status.error {
+            border-color: rgba(255, 0, 85, 0.3);
+            background: rgba(255, 0, 85, 0.05);
+            color: #ff5588;
+        }
+
+        .cloud-icon {
+            font-size: 1.1rem;
+        }
+
+        .cloud-text {
+            font-size: 0.8rem;
+        }
+
+        /* 云同步配置面板 */
+        .cloud-config-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .cloud-config-panel.active {
+            display: flex;
+        }
+
+        .cloud-config-content {
+            background: linear-gradient(135deg, rgba(20, 20, 30, 0.98), rgba(10, 10, 15, 0.99));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .cloud-config-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #0088ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cloud-config-content p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .config-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .config-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: #0088ff;
+            box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.2);
+        }
+
+        .config-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .config-help {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .config-help a {
+            color: #0088ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .config-help a:hover {
+            text-decoration: underline;
+        }
+
+        /* 同步指示器动画 */
+        @keyframes cloudPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .cloud-status.syncing .cloud-icon {
+            animation: cloudPulse 1.5s ease-in-out infinite;
+        }
+
+        /* 离线模式提示 */
+        .offline-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #ff8800, #ff5500);
+            color: #000;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: bold;
+            font-size: 0.85rem;
+            z-index: 1001;
+            transform: translateY(-100%);
+            transition: transform 0.3s;
+        }
+
+        .offline-banner.show {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .cloud-status {
+                margin-left: 0;
+                margin-top: 0.5rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+        }
+</style>
+    <base target="_blank">
+<base target="_blank">
+<!-- Supabase SDK -->
+<script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
+
+    // 暴露到全局供主脚本使用
+    window.supabaseModule = { createClient };
+
+    // 标记SDK已加载完成
+    window.supabaseReady = true;
+
+    // 如果codex已存在，触发初始化
+    if (window.codex && typeof window.codex.initCloudSync === 'function') {
+        window.codex.initCloudSync();
+    }
+</script>
+
+<!-- Supabase SDK 备用加载（如果ES模块失败） -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script>
+    // 如果模块方式未加载成功，使用全局变量
+    if (!window.supabaseModule && window.supabase) {
+        window.supabaseModule = { 
+            createClient: window.supabase.createClient 
+        };
+    }
+</script>
+<base target="_blank">
+<base target="_blank">
 </head>
 
 <body>
+    <!-- 云同步配置面板 -->
+    <div class="cloud-config-panel" id="cloudConfigPanel">
+        <div class="cloud-config-content">
+            <h3>☁️ 云端同步设置</h3>
+            <p>配置Supabase实现跨设备数据同步</p>
+            <div class="config-inputs">
+                <input type="text" id="supabaseUrl" placeholder="Project URL (如: https://xxxxx.supabase.co)" class="config-input">
+                <input type="password" id="supabaseKey" placeholder="anon/public API Key" class="config-input">
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-small" onclick="codex.toggleCloudConfig()">取消</button>
+                <button class="btn primary btn-small" onclick="codex.saveCloudConfig()">保存并连接</button>
+            </div>
+            <div class="config-help">
+                <a href="https://supabase.com/docs/guides/getting-started/quickstarts/javascript" target="_blank">如何获取配置？</a>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
+                    1. 访问 supabase.com 创建项目<br>
+                    2. 进入 Project Settings → API<br>
+                    3. 复制 Project URL 和 anon Key
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-animation"></div><!-- 离线提示横幅 -->
+    <div class="offline-banner" id="offlineBanner">
+        ⚠️ 离线模式 - 数据将保存在本地，恢复连接后自动同步
+    </div>
+
+    <header>
+        <h1>⚡ 卡牌图鉴编辑器 ⚡</h1>
+        <div class="subtitle">点击卡牌编辑 · 悬停查看详情 · 右键快速删除 · 筛选查找卡牌</div>
+    </header>
+
+    <div class="toolbar">
+        <button class="btn primary" onclick="codex.openModal()">
+            <span>➕</span> 新建卡牌
+        </button>
+        <button class="btn" onclick="codex.importData()">
+            <span>📥</span> 导入JSON
+        </button>
+        <button class="btn" onclick="codex.exportData()">
+            <span>📤</span> 导出JSON
+        </button>
+        <button class="btn" onclick="codex.resetData()" style="border-color: rgba(255,0,85,0.3); color: #ff5588;">
+            <span>🗑️</span> 重置默认
+        </button>
+        <div class="cloud-status" id="cloudStatus">
+            <span class="cloud-icon">☁️</span>
+            <span class="cloud-text">连接中...</span>
+        </div>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+        <div class="filter-panel" id="filterPanel">
+            <div class="filter-header">
+                <div class="filter-title">
+                    <span>🔍</span> 筛选与搜索
+                </div>
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" 
+                        placeholder="搜索名称、描述、Key、标签..." 
+                        oninput="codex.onSearchInput()">
+                    <button class="search-clear" id="searchClear" onclick="codex.clearSearch()" style="display: none;">×</button>
+                </div>
+                <div class="filter-stats" id="filterStats">显示全部 0 张卡牌</div>
+            </div>
+            <div class="filter-groups" id="filterGroups">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <header>
-            <h1>卡牌图鉴</h1>
-            <p class="subtitle">浏览和管理你的卡牌收藏</p>
-        </header>
-
-        <!-- 上传控件（仍隐藏） -->
-        <div class="import-section">
-            <p>（已禁用上传，默认读取仓库 card.json）</p>
-        </div>
-
-        <!-- 筛选区 -->
-        <div class="controls">
-            <div class="filter-group">
-                <div class="filter-item">
-                    <label for="searchInput">搜索卡牌</label>
-                    <input type="text" id="searchInput" placeholder="输入卡牌名称或描述...">
-                </div>
-                <div class="filter-item">
-                    <label for="typeFilter">类型筛选</label>
-                    <select id="typeFilter">
-                        <option value="">全部类型</option>
-                    </select>
-                </div>
-                <div class="filter-item">
-                    <label for="roleFilter">职业筛选</label>
-                    <select id="roleFilter">
-                        <option value="">全部职业</option>
-                    </select>
-                </div>
-                <div class="filter-item">
-                    <label>标签筛选（多选）</label>
-                    <div id="tagFilters" class="checkbox-group"></div>
-                </div>
-                <div class="filter-item">
-                    <label>稀有度筛选（多选）</label>
-                    <div id="rarityFilters" class="checkbox-group"></div>
-                </div>
+        <div class="card-grid" id="cardGrid">
+            <div class="empty-state">
+                <div class="empty-icon">🎴</div>
+                <div>暂无卡牌数据，点击上方"新建卡牌"开始创建</div>
             </div>
         </div>
+    </div>
 
-        <!-- 卡牌网格 -->
-        <div id="cardsContainer" class="cards-grid">
-            <div class="no-results">正在加载 card.json …</div>
+    <!-- 编辑模态框 -->
+    <div class="modal-overlay" id="cardModal" onclick="codex.closeModalOnOverlay(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">新建卡牌</div>
+                <button class="modal-close" onclick="codex.closeModal()">×</button>
+            </div>
+
+            <form id="cardForm" onsubmit="codex.saveCard(event)">
+                <input type="hidden" id="cardId">
+
+                <div class="form-grid">
+                    <!-- Key 输入框 - 新增 -->
+                    <div class="form-group full">
+                        <label class="form-label">🔑 唯一标识符 (Key)</label>
+                        <div class="key-input-wrapper">
+                            <input type="text" class="form-input" id="cardKey" required
+                                placeholder="例如：flameSword, healingPotion" pattern="[a-zA-Z0-9_]+"
+                                title="只能使用字母、数字和下划线">
+                            <div class="key-input-hint" id="keyHint">新建卡牌时填写，保存后不可修改</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">📛 卡牌名称</label>
+                        <input type="text" class="form-input" id="cardName" required placeholder="输入卡牌名称" oninput="codex.syncFullCardToJson()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">🏷️ 类型</label>
+                        <select class="form-select" id="cardType" onchange="codex.syncFullCardToJson()">
+                            <option value="attack">⚔️ 攻击</option>
+                            <option value="equipment">🔧 装备</option>
+                            <option value="magic">🔮 法术</option>
+                            <option value="spell">✨ 咒语</option>
+                            <option value="pet">🐾 宠物</option>
+                            <option value="weapon">🗡️ 武器</option>
+                            <option value="shield">🛡️ 盾牌</option>
+                            <option value="food">🍖 食物</option>
+                            <option value="accessories">💍 饰品</option>
+                            <option value="magicbook">📖 魔法书</option>
+                            <option value="armor">👕 护甲</option>
+                            <option value="potion">🧪 药水</option>
+                            <option value="magicScroll">📜 魔法卷轴</option>
+                            <option value="skill">⚡ 技能</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">✨ 稀有度</label>
+                        <select class="form-select" id="cardRarity" onchange="codex.syncFullCardToJson()">
+                            <option value="common">⬜ 普通</option>
+                            <option value="special">🟢 特殊</option>
+                            <option value="exclusive">🟣 专属</option>
+                            <option value="rare">🔵 罕见</option>
+                            <option value="epic">🟣 史诗</option>
+                            <option value="legendary">🟨 传说</option>
+                            <option value="mythic">🔴 神话</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">📝 描述文本 (支持变量如 (amount1), (data))</label>
+                        <textarea class="form-textarea" id="cardDesc" rows="3" oninput="codex.syncFullCardToJson()"
+                            placeholder="例如：造成(amount1)点伤害，持续(data)秒" style="width: 100%;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">💰 价格</label>
+                        <input type="number" class="form-input" id="cardGold" min="0" value="0" oninput="codex.syncFullCardToJson()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">⚔️ 伤害</label>
+                        <input type="number" class="form-input" id="cardDamage" min="0" value="0" oninput="codex.syncFullCardToJson()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">💧 MP消耗</label>
+                        <input type="number" class="form-input" id="cardMp" min="0" placeholder="空为无消耗" oninput="codex.syncFullCardToJson()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">⚡ AP消耗</label>
+                        <input type="number" class="form-input" id="cardAp" min="0" placeholder="空为无消耗" oninput="codex.syncFullCardToJson()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">🎯 命中率 (%)</label>
+                        <input type="number" class="form-input" id="cardHit" min="0" max="100" value="100" oninput="codex.syncFullCardToJson()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">⏱️ 冷却 (秒)</label>
+                        <input type="number" class="form-input" id="cardCooldown" min="0" step="0.1" value="0" oninput="codex.syncFullCardToJson()">
+                    </div>
+
+                    <!-- 职业复选框 -->
+                    <div class="form-group full">
+                        <label class="form-label">👥 适用职业</label>
+                        <div class="checkbox-group" id="careerCheckboxes">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 元素标签复选框 -->
+                    <div class="form-group full">
+                        <label class="form-label">🔮 元素标签</label>
+                        <div class="checkbox-group" id="tagCheckboxes">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">
+                            <span>📊</span> 数据变量 (用于替换描述中的变量)
+                        </label>
+                        <div class="kv-editor" id="kvEditor">
+                            <div class="kv-list" id="kvList">
+                                <!-- 动态生成的键值对 -->
+                            </div>
+                            <div class="kv-add-row">
+                                <input type="text" class="form-input kv-key" id="newKey" placeholder="键 (如: amount1)">
+                                <input type="text" class="form-input kv-value" id="newValue" placeholder="值 (如: 5)">
+                                <button type="button" class="btn btn-small" onclick="codex.addKV()">➕ 添加</button>
+                            </div>
+                        </div>
+                        <div class="kv-json-preview" style="width: 100%;">
+                            <label class="form-label" style="margin-top: 0.75rem;">
+                                <span>📝</span> 完整卡牌JSON预览 (只读)
+                            </label>
+                            <textarea class="form-textarea" id="cardData" rows="12" 
+                                placeholder='{"name": "卡牌名称", "type": "attack", "rarity": "common", "data": {"amount1": 5}}' 
+                                readonly 
+                                style="width: 100%; min-height: 300px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.5; background: rgba(255, 255, 255, 0.03); cursor: not-allowed;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="codex.closeModal()">取消</button>
+                    <button type="submit" class="btn success btn-full">💾 保存卡牌</button>
+                </div>
+            </form>
         </div>
-        <!-- ===== 编辑浮层（含 data / tag / career 可视化维护） ===== -->
-        <!-- 一页无滚动 modal -->
-        <div id="editModal" class="modal-mask">
-            <div class="modal"
-                style="max-height:100vh;display:grid;grid-template-rows:auto auto 1fr auto;gap:10px;padding:20px 24px;">
-                <!-- ① 标题 -->
-                <h3 style="margin:0;font-weight:600;color:#2c3e50;">快速编辑</h3>
+    </div>
 
-                <!-- ② 短字段一行 -->
-                <div class="row-compact">
-                    <label>名称</label><input id="editName" placeholder="名称">
-                    <!-- 放在名称后面，伤害前面即可 -->
-                    <label>类型</label>
-                    <select id="editType"></select>
-                    <label>稀有度</label>
-                    <select id="editRarity"></select>
-
-                </div>
-                <div class="row-compact">
-                    <label>伤害</label><input id="editDamage" type="number" placeholder="伤害">
-                    <label>命中</label><input id="editHit" type="number" placeholder="命中">
-                    <label>冷却</label><input id="editCooldown" type="number" placeholder="冷却(s)">
-                    <label>价值</label><input id="editGold" type="number" placeholder="价值">
-                </div>
-                <div class="row-compact">
-                    <label>MP</label><input id="editMp" type="number" placeholder="MP">
-                    <label>AP</label><input id="editAp" type="number" placeholder="AP">
-                </div>
-                <!-- ③ 描述全宽 -->
-                <label>描述</label>
-                <textarea id="editDesc" rows="3" style="width:100%;resize:none;"></textarea>
-
-                <!-- ④ data / tag / career 紧凑维护区（内部再分栏） -->
-                <div class="mini-maintain">
-                    <!-- data -->
-                    <section>
-                        <label>data 对象</label>
-                        <div id="dataList" class="mini-list"></div>
-                        <button class="add" onclick="addDataKV()">+ 新增键值</button>
-                    </section>
-
-                    <!-- tag -->
-                    <section>
-                        <label>tag 数组</label>
-                        <div id="tagList" class="mini-list"></div>
-                        <button class="add" onclick="addTagItem()">+ 添加 tag</button>
-                    </section>
-
-                    <!-- career -->
-                    <section>
-                        <label>career 数组</label>
-                        <div id="careerList" class="mini-list"></div>
-                        <button class="add" onclick="addCareerItem()">+ 添加 career</button>
-                    </section>
-                </div>
-
-                <!-- ⑤ JSON 预览 -->
-                <label>卡牌 JSON（实时预览，只读）</label>
-                <textarea id="jsonPreview" readonly style="width:100%;min-height:300px;font-size:12px;"></textarea>
-
-                <!-- ⑥ 按钮 -->
-                <div class="actions" style="text-align:right;">
-                    <button class="cancel" onclick="closeEdit()">取消</button>
-                    <button class="save" onclick="saveEdit()">保存</button>
-                </div>
+    <!-- 确认删除对话框 -->
+    <div class="modal-overlay" id="confirmModal" onclick="codex.closeConfirmOnOverlay(event)">
+        <div class="confirm-dialog" onclick="event.stopPropagation()">
+            <div class="confirm-title">⚠️ 确认删除</div>
+            <div class="confirm-text" id="confirmText">确定要删除这张卡牌吗？此操作无法撤销。</div>
+            <div class="modal-actions">
+                <button class="btn" onclick="codex.closeConfirm()">取消</button>
+                <button class="btn primary" onclick="codex.confirmDelete()">确认删除</button>
             </div>
         </div>
-        <script>
-            /* ============ 入口：读 card.json（无缓存） ============ */
-            window.addEventListener('DOMContentLoaded', () => {
-                injectColorStyles();   // 动态注入颜色
-                fetch(`card.json?t=${Date.now()}`)
-                    .then(r => r.json())
-                    .then(json => {
-                        cardsData = json;
-                        initFilters();
-                        displayCards(cardsData);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        document.getElementById('cardsContainer').innerHTML =
-                            '<div class="no-results">读取 card.json 失败</div>';
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // 类型映射 - 14种类型
+        const typeMap = {
+            'attack': { icon: '⚔️', label: '攻击', color: '#ff4444', glow: 'rgba(255,68,68,0.3)' },
+            'equipment': { icon: '🔧', label: '装备', color: '#888899', glow: 'rgba(136,136,153,0.3)' },
+            'magic': { icon: '🔮', label: '法术', color: '#aa00ff', glow: 'rgba(170,0,255,0.3)' },
+            'spell': { icon: '✨', label: '咒语', color: '#ff00aa', glow: 'rgba(255,0,170,0.3)' },
+            'pet': { icon: '🐾', label: '宠物', color: '#ff8800', glow: 'rgba(255,136,0,0.3)' },
+            'weapon': { icon: '🗡️', label: '武器', color: '#cc0000', glow: 'rgba(204,0,0,0.3)' },
+            'shield': { icon: '🛡️', label: '盾牌', color: '#00aaff', glow: 'rgba(0,170,255,0.3)' },
+            'food': { icon: '🍖', label: '食物', color: '#88cc00', glow: 'rgba(136,204,0,0.3)' },
+            'accessories': { icon: '💍', label: '饰品', color: '#ffdd00', glow: 'rgba(255,221,0,0.3)' },
+            'magicbook': { icon: '📖', label: '魔法书', color: '#6600ff', glow: 'rgba(102,0,255,0.3)' },
+            'armor': { icon: '👕', label: '护甲', color: '#0044cc', glow: 'rgba(0,68,204,0.3)' },
+            'potion': { icon: '🧪', label: '药水', color: '#ccff00', glow: 'rgba(204,255,0,0.3)' },
+            'magicScroll': { icon: '📜', label: '魔法卷轴', color: '#cd7f32', glow: 'rgba(205,127,50,0.3)' },
+            'skill': { icon: '⚡', label: '技能', color: '#00ffcc', glow: 'rgba(0,255,204,0.3)' }
+        };
+
+        // 稀有度映射 - 7种稀有度（神话为红色）
+        const rarityMap = {
+            'common': { label: '普通', class: 'rarity-common', color: '#888888' },
+            'special': { label: '特殊', class: 'rarity-special', color: '#00ff88' },
+            'exclusive': { label: '专属', class: 'rarity-exclusive', color: '#ff00ff' },
+            'rare': { label: '罕见', class: 'rarity-rare', color: '#0088ff' },
+            'epic': { label: '史诗', class: 'rarity-epic', color: '#aa00ff' },
+            'legendary': { label: '传说', class: 'rarity-legendary', color: '#ffaa00' },
+            'mythic': { label: '神话', class: 'rarity-mythic', color: '#ff0000' }
+        };
+
+        // 职业映射 - 10种职业
+        const careerMap = {
+            'warrior': { icon: '⚔️', label: '战士', color: '#cc0000', glow: 'rgba(204,0,0,0.3)' },
+            'mage': { icon: '🔮', label: '法师', color: '#6600ff', glow: 'rgba(102,0,255,0.3)' },
+            'priest': { icon: '✝️', label: '牧师', color: '#ffdd00', glow: 'rgba(255,221,0,0.3)' },
+            'rogue': { icon: '🗡️', label: '刺客', color: '#555555', glow: 'rgba(85,85,85,0.3)' },
+            'hunter': { icon: '🏹', label: '猎人', color: '#88cc00', glow: 'rgba(136,204,0,0.3)' },
+            'warlock': { icon: '☠️', label: '术士', color: '#660066', glow: 'rgba(102,0,102,0.3)' },
+            'knight': { icon: '🛡️', label: '骑士', color: '#0044cc', glow: 'rgba(0,68,204,0.3)' },
+            'shaman': { icon: '🔥', label: '萨满', color: '#ff6600', glow: 'rgba(255,102,0,0.3)' },
+            'druid': { icon: '🌿', label: '德鲁伊', color: '#00cc44', glow: 'rgba(0,204,68,0.3)' },
+            'necromancer': { icon: '💀', label: '死灵法师', color: '#333333', glow: 'rgba(51,51,51,0.3)' },
+            'demonhunter': { icon: '👹', label: '恶魔猎手', color: '#ff0000', glow: 'rgba(255,0,0,0.3)' },
+            'engineer': { icon: '🔧', label: '工程师', color: '#00cc44', glow: 'rgba(0,204,68,0.3)' },
+            'guardian': { icon: '🕵️', label: '守护者', color: '#ff8800', glow: 'rgba(255,136,0,0.3)' },
+        };
+
+        // 标签映射
+        const tagMap = {
+            'fire': { icon: '🔥', label: '火', color: '#ff4400', glow: 'rgba(255,68,0,0.3)' },
+            'ice': { icon: '❄️', label: '冰', color: '#00ccff', glow: 'rgba(0,204,255,0.3)' },
+            'lightning': { icon: '⚡', label: '雷', color: '#ffdd00', glow: 'rgba(255,221,0,0.3)' },
+            'poison': { icon: '☠️', label: '毒', color: '#00cc00', glow: 'rgba(0,204,0,0.3)' },
+            'holy': { icon: '✨', label: '神圣', color: '#fffacd', glow: 'rgba(255,250,205,0.3)' },
+            'dark': { icon: '🌑', label: '黑暗', color: '#440066', glow: 'rgba(68,0,102,0.3)' },
+            'blood': { icon: '🩸', label: '血', color: '#cc0000', glow: 'rgba(204,0,0,0.3)' },
+            'wind': { icon: '💨', label: '风', color: '#88ccff', glow: 'rgba(136,204,255,0.3)' },
+            'earth': { icon: '🪨', label: '土', color: '#996633', glow: 'rgba(153,102,51,0.3)' },
+            'arcane': { icon: '🔮', label: '奥术', color: '#aa00ff', glow: 'rgba(170,0,255,0.3)' },
+            'summon': { icon: '👻', label: '召唤', color: '#ff88ff', glow: 'rgba(255,136,255,0.3)' },
+            'healing': { icon: '💚', label: '治疗', color: '#00ff88', glow: 'rgba(0,255,136,0.3)' },
+            'jungle': { icon: '🌳', label: '森林', color: '#008800', glow: 'rgba(0,136,0,0.3)' },
+            'water': { icon: '🌊', label: '水', color: '#0088ff', glow: 'rgba(0,136,255,0.3)' },
+            'void': { icon: '⚫', label: '虚空', color: '#000000', glow: 'rgba(0,0,0,0.3)' },
+            'disease': { icon: '🩸', label: '疾病', color: '#cc00cc', glow: 'rgba(204,0,204,0.3)' },
+            'life': { icon: '❤️', label: '生命', color: '#ff8800', glow: 'rgba(255,136,0,0.3)' },
+            'death': { icon: '💀', label: '死亡', color: '#000000', glow: 'rgba(0,0,0,0.3)' },
+
+
+
+        };
+
+        // 更新后的默认数据
+        const defaultData = {
+            "healingPotion": {
+                "name": "治愈药水",
+                "desc": "【战斗开始时】恢复(amount1)点生命值。",
+                "gold": 4,
+                "type": "potion",
+                "rarity": "common",
+                "mp": null,
+                "ap": null,
+                "cooldown": 5,
+                "data": { "amount1": 50 },
+                "career": ["priest", "druid"],
+                "tag": ["healing", "holy"],
+                "damage": 0,
+                "hit": 100
+            },
+            "flameSword": {
+                "name": "烈焰之刃",
+                "desc": "(cooldown)秒后，攻击时附加(amount1)层[燃烧]，持续(duration)秒。",
+                "gold": 8,
+                "type": "weapon",
+                "rarity": "rare",
+                "mp": 15,
+                "ap": 25,
+                "cooldown": 8,
+                "data": { "amount1": 3, "duration": 5 },
+                "career": ["warrior", "knight"],
+                "tag": ["fire"],
+                "damage": 45,
+                "hit": 90
+            },
+            "frostArmor": {
+                "name": "霜冻护甲",
+                "desc": "受到攻击时，有(amount1)%几率冻结攻击者。",
+                "gold": 10,
+                "type": "armor",
+                "rarity": "epic",
+                "mp": 20,
+                "ap": null,
+                "cooldown": 0,
+                "data": { "amount1": 15 },
+                "career": ["mage", "knight"],
+                "tag": ["ice"],
+                "damage": 0,
+                "hit": 100
+            },
+            "bloodRitual": {
+                "name": "血祭仪式",
+                "desc": "牺牲(amount1)%生命值，对敌人造成(damage)点真实伤害。",
+                "gold": 20,
+                "type": "magic",
+                "rarity": "mythic",
+                "mp": 50,
+                "ap": 30,
+                "cooldown": 15,
+                "data": { "amount1": 20, "damage": 200 },
+                "career": ["warlock"],
+                "tag": ["blood", "dark"],
+                "damage": 200,
+                "hit": 100
+            },
+            "dragonPet": {
+                "name": "幼龙",
+                "desc": "召唤一只幼龙协助战斗，每秒造成(amount1)点火焰伤害。",
+                "gold": 50,
+                "type": "pet",
+                "rarity": "legendary",
+                "mp": 0,
+                "ap": 100,
+                "cooldown": 60,
+                "data": { "amount1": 10 },
+                "career": ["hunter"],
+                "tag": ["fire", "summon"],
+                "damage": 10,
+                "hit": 95
+            },
+            'waterElemental': {
+                'name': "水精灵",
+                'damage': 10,
+                'hit': 95,
+                'cooldown': 2.8,
+                'type': "pet",
+                'rarity': "special",
+                'tag': ["water"],
+                'career': ['warrior'],
+                'desc': "【击中对手时】获得(amount1)点MP。牌组每有一个水系卡牌，就有(amount2)%的几率再获得(amount3)点MP。<br/><br/>【被动】牌组每有一张[水系]魔法牌，攻击速度加快(amount4)%。<br/><br/>【一次性技能】消耗10点MP：生命上限提升(20)点。<br/><br/>【一次性技能】消耗20点MP：提升15点伤害。<br/><br/>【一次性技能】消耗30点MP：恢复(20)%生命。",
+                'data': {
+                    amount1: 2,
+                    amount2: 10,
+                    amount3: 2,
+                    amount4: 10
+                },
+            },
+        };
+        class CardCodex {
+            constructor() {
+                this.cards = new Map();
+                this.currentEditId = null;
+                this.deleteTargetId = null;
+                this.tooltip = document.getElementById('tooltip');
+
+                // 初始化筛选状态
+                this.activeFilters = {
+                    type: new Set(),
+                    rarity: new Set(),
+                    career: new Set(),
+                    tag: new Set()
+                };
+
+                // 搜索状态
+                this.searchQuery = '';
+
+                // 筛选选项统计
+                this.filterOptions = {
+                    type: new Map(),
+                    rarity: new Map(),
+                    career: new Map(),
+                    tag: new Map()
+                };
+
+                this.loadData();
+                this.initCheckboxes();
+                this.initFilters();
+                this.initKeyInput();
+                this.kvData = {}; // 键值对数据缓存
+
+                // 云同步状态
+                this.cloudConfig = this.loadCloudConfig();
+                this.supabase = null;
+                this.userId = this.getOrCreateUserId();
+                this.syncChannel = null;
+                this.isCloudSyncEnabled = false;
+                this.syncDebounceTimer = null;
+                this.lastSyncTime = 0;
+
+                // 延迟初始化云同步，等待SDK加载
+                setTimeout(() => this.initCloudSync(), 100);
+            }
+
+            loadData() {
+                const saved = localStorage.getItem('cardCodexData');
+                const data = saved ? JSON.parse(saved) : defaultData;
+                this.cards = new Map(Object.entries(data));
+                this.updateFilterOptions();
+                this.render();
+            }
+
+            saveStorage() {
+                const obj = Object.fromEntries(this.cards);
+                localStorage.setItem('cardCodexData', JSON.stringify(obj));
+                // 触发云同步
+                this.syncToCloud();
+            }
+
+            // 保留旧的saveCloudConfigToStorage和loadCloudConfig
+            saveCloudConfigToStorage(config) {
+                localStorage.setItem('cardCodexCloudConfig', JSON.stringify(config));
+                this.cloudConfig = config;
+            }
+
+            generateId() {
+                return 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            // 初始化 Key 输入框实时验证
+            initKeyInput() {
+                const keyInput = document.getElementById('cardKey');
+                const keyHint = document.getElementById('keyHint');
+
+                keyInput.addEventListener('input', (e) => {
+                    const value = e.target.value.trim();
+
+                    // 验证格式
+                    if (!/^[a-zA-Z0-9_]*$/.test(value)) {
+                        keyHint.textContent = '❌ 只能使用字母、数字和下划线';
+                        keyHint.className = 'key-input-hint error';
+                        return;
+                    }
+
+                    // 检查是否为空
+                    if (!value) {
+                        keyHint.textContent = '新建卡牌时填写，保存后不可修改';
+                        keyHint.className = 'key-input-hint';
+                        return;
+                    }
+
+                    // 检查是否已存在（编辑模式除外）
+                    if (!this.currentEditId && this.cards.has(value)) {
+                        keyHint.textContent = '⚠️ 此 Key 已被使用';
+                        keyHint.className = 'key-input-hint error';
+                        return;
+                    }
+
+                    // 检查是否为编辑模式且修改了Key
+                    if (this.currentEditId && value !== this.currentEditId && this.cards.has(value)) {
+                        keyHint.textContent = '⚠️ 此 Key 已被其他卡牌使用';
+                        keyHint.className = 'key-input-hint error';
+                        return;
+                    }
+
+                    keyHint.textContent = '✓ Key 可用';
+                    keyHint.className = 'key-input-hint success';
+                });
+            }
+
+            // 初始化复选框
+            initCheckboxes() {
+                // 生成职业复选框
+                const careerContainer = document.getElementById('careerCheckboxes');
+                careerContainer.innerHTML = Object.entries(careerMap).map(([key, info]) => `
+                    <label class="checkbox-item" style="--checkbox-color: ${info.color}">
+                        <input type="checkbox" name="career" value="${key}" hidden onchange="codex.syncFullCardToJson()">
+                        <span class="checkbox-box">
+                            <span class="checkbox-icon">${info.icon}</span>
+                            <span>${info.label}</span>
+                        </span>
+                    </label>
+                `).join('');
+
+                // 生成元素复选框
+                const tagContainer = document.getElementById('tagCheckboxes');
+                tagContainer.innerHTML = Object.entries(tagMap).map(([key, info]) => `
+                    <label class="checkbox-item" style="--checkbox-color: ${info.color}">
+                        <input type="checkbox" name="tag" value="${key}" hidden onchange="codex.syncFullCardToJson()">
+                        <span class="checkbox-box">
+                            <span class="checkbox-icon">${info.icon}</span>
+                            <span>${info.label}</span>
+                        </span>
+                    </label>
+                `).join('');
+            }
+
+            // 获取选中的复选框值
+            getCheckedValues(name) {
+                return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+            }
+
+            // 设置复选框选中状态
+            setCheckedValues(name, values) {
+                document.querySelectorAll(`input[name="${name}"]`).forEach(cb => {
+                    cb.checked = values.includes(cb.value);
+                });
+                // 同步到JSON预览
+                if (this.syncFullCardToJson) {
+                    this.syncFullCardToJson();
+                }
+            }
+
+            // 更新筛选选项统计
+            updateFilterOptions() {
+                // 重置统计
+                ['type', 'rarity', 'career', 'tag'].forEach(key => {
+                    this.filterOptions[key].clear();
+                });
+
+                // 统计所有卡牌
+                this.cards.forEach(card => {
+                    if (card.type) this.filterOptions.type.set(card.type, (this.filterOptions.type.get(card.type) || 0) + 1);
+                    if (card.rarity) this.filterOptions.rarity.set(card.rarity, (this.filterOptions.rarity.get(card.rarity) || 0) + 1);
+
+                    (card.career || []).forEach(c => {
+                        this.filterOptions.career.set(c, (this.filterOptions.career.get(c) || 0) + 1);
                     });
-            });
+                    (card.tag || []).forEach(t => {
+                        this.filterOptions.tag.set(t, (this.filterOptions.tag.get(t) || 0) + 1);
+                    });
+                });
 
-
-            /* ============ 实时预览：统一监听所有控件 ============ */
-            /* 把表单当前值刷回数据并更新预览 */
-            function flushFormToData() {
-                if (!editingKey) return;
-                const c = cardsData[editingKey];
-                c.name = document.getElementById('editName').value.trim() || c.name;
-                c.desc = document.getElementById('editDesc').value.trim() || c.desc;
-                c.damage = toNum(document.getElementById('editDamage').value);
-                c.hit = toNum(document.getElementById('editHit').value);
-                c.cooldown = toNum(document.getElementById('editCooldown').value);
-                c.gold = toNum(document.getElementById('editGold').value);
-                c.mp = toNum(document.getElementById('editMp').value);
-                c.ap = toNum(document.getElementById('editAp').value);
-                c.type = document.getElementById('editType').value;
-                c.rarity = document.getElementById('editRarity').value;
-                syncJsonPreview();
+                this.renderFilters();
             }
 
-            /* 给 modal 里所有表单元素绑统一监听 */
-            function bindLivePreview() {
-                const root = document.querySelector('#editModal');
-                // 文本/数字框、下拉框
-                root.querySelectorAll('input, textarea, select').forEach(el => {
-                    el.oninput = el.onchange = flushFormToData;
+            // 初始化筛选器 UI
+            initFilters() {
+                this.renderFilters();
+            }
+
+            // 渲染筛选器
+            renderFilters() {
+                const container = document.getElementById('filterGroups');
+
+                const sections = [
+                    { key: 'type', label: '🏷️ 类型', map: typeMap },
+                    { key: 'rarity', label: '✨ 稀有度', map: rarityMap },
+                    { key: 'career', label: '👥 职业', map: careerMap },
+                    { key: 'tag', label: '🔮 元素', map: tagMap }
+                ];
+
+                container.innerHTML = sections.map(section => {
+                    // 始终显示内置所有选项，count 从当前统计中获取（可能为0）
+                    const chips = Object.keys(section.map).map(key => {
+                        const count = this.filterOptions[section.key].get(key) || 0;
+                        const isActive = this.activeFilters[section.key].has(key);
+                        const info = section.map[key];
+
+                        // 数量为0时降低透明度但仍可点击
+                        const disabledStyle = count === 0 ? 'opacity: 0.35; filter: grayscale(0.8);' : '';
+
+                        return `
+                <button class="filter-chip ${isActive ? 'active' : ''}" 
+                        onclick="codex.toggleFilter('${section.key}', '${key}')"
+                        style="${isActive ? `--chip-color: ${info.color}; --chip-glow: ${info.glow}` : ''} ${disabledStyle}"
+                        title="${info.label}${count > 0 ? ` (${count}张)` : ' (无卡牌)'}">
+                    ${info.icon || ''} ${info.label}
+                    <span class="count" style="${count === 0 ? 'opacity: 0.3;' : ''}">${count}</span>
+                </button>
+            `;
+                    }).join('');
+
+                    const clearBtn = this.activeFilters[section.key].size > 0
+                        ? `<button class="btn btn-small clear-filters" onclick="codex.clearFilterCategory('${section.key}')">清除</button>`
+                        : '';
+
+                    return `
+            <div class="filter-row">
+                <span class="filter-label">${section.label}</span>
+                <div class="filter-chips">
+                    ${chips}
+                    ${clearBtn}
+                </div>
+            </div>
+        `;
+                }).join('');
+
+                // 更新统计信息
+                this.updateFilterStats();
+            }
+
+            // 切换筛选条件
+            toggleFilter(category, value) {
+                const set = this.activeFilters[category];
+                if (set.has(value)) {
+                    set.delete(value);
+                } else {
+                    set.add(value);
+                }
+                this.renderFilters();
+                this.render();
+            }
+
+            // 清除某一类筛选
+            clearFilterCategory(category) {
+                this.activeFilters[category].clear();
+                this.renderFilters();
+                this.render();
+            }
+
+            // 清除所有筛选和搜索
+            clearFilters() {
+                Object.keys(this.activeFilters).forEach(key => this.activeFilters[key].clear());
+                this.clearSearch();
+                this.renderFilters();
+                this.render();
+            }
+
+            // 检查是否有激活的筛选
+            hasActiveFilters() {
+                return Object.values(this.activeFilters).some(set => set.size > 0);
+            }
+
+            // 获取筛选后的卡牌（包含搜索）
+            getFilteredCards() {
+                let result = Array.from(this.cards.entries());
+
+                // 应用搜索过滤
+                if (this.searchQuery) {
+                    result = result.filter(([id, card]) => this.matchesSearch(card, this.searchQuery));
+                }
+
+                // 应用分类筛选
+                if (this.hasActiveFilters()) {
+                    result = result.filter(([id, card]) => {
+                        // 类型筛选
+                        if (this.activeFilters.type.size > 0 && !this.activeFilters.type.has(card.type)) {
+                            return false;
+                        }
+
+                        // 稀有度筛选
+                        if (this.activeFilters.rarity.size > 0 && !this.activeFilters.rarity.has(card.rarity)) {
+                            return false;
+                        }
+
+                        // 职业筛选（有交集即可）
+                        if (this.activeFilters.career.size > 0) {
+                            const cardCareers = card.career || [];
+                            const hasCareerMatch = Array.from(this.activeFilters.career).some(c => cardCareers.includes(c));
+                            if (!hasCareerMatch) return false;
+                        }
+
+                        // 标签筛选（有交集即可）
+                        if (this.activeFilters.tag.size > 0) {
+                            const cardTags = card.tag || [];
+                            const hasTagMatch = Array.from(this.activeFilters.tag).some(t => cardTags.includes(t));
+                            if (!hasTagMatch) return false;
+                        }
+
+                        return true;
+                    });
+                }
+
+                return result;
+            }
+
+            parseDescription(desc, card) {
+                let parsed = desc || '';
+
+                const variables = {
+                    ...(card.data || {}),
+                    cooldown: card.cooldown,
+                    damage: card.damage,
+                    mp: card.mp,
+                    ap: card.ap,
+                    gold: card.gold,
+                    hit: card.hit
+                };
+
+                Object.entries(variables).forEach(([key, value]) => {
+                    if (value !== null && value !== undefined && value !== '') {
+                        const regex = new RegExp(`\\(${key}\\)`, 'g');
+                        parsed = parsed.replace(regex, `<span class="highlight">${value}</span>`);
+                    }
+                });
+
+                parsed = parsed.replace(/\[(.*?)\]/g, '<span class="highlight">[$1]</span>');
+                return parsed;
+            }
+
+            createCardElement(id, card) {
+                const typeInfo = typeMap[card.type] || { icon: '📦', label: '未知', color: '#888', glow: 'rgba(136,136,136,0.3)' };
+                const rarityInfo = rarityMap[card.rarity] || rarityMap.common;
+
+                const el = document.createElement('div');
+                el.className = `card-item ${rarityInfo.class}`;
+                el.dataset.id = id;
+
+                // 如果有搜索，添加高亮样式
+                if (this.searchQuery) {
+                    el.classList.add('search-highlight');
+                }
+
+                const previewStats = [];
+                if (card.gold) previewStats.push(`<span class="preview-stat">💰 ${card.gold}</span>`);
+                if (card.damage) previewStats.push(`<span class="preview-stat">⚔️ ${card.damage}</span>`);
+                if (card.cooldown) previewStats.push(`<span class="preview-stat">⏱️ ${card.cooldown}s</span>`);
+
+                // 高亮匹配的名称
+                const displayName = this.searchQuery 
+                    ? this.highlightText(card.name || '未命名', this.searchQuery)
+                    : (card.name || '未命名');
+
+                el.innerHTML = `
+                    <div class="rarity-badge"></div>
+                    <div class="card-key" title="${id}">${id}</div>
+                    <div class="card-actions">
+                        <button class="action-btn edit" onclick="event.stopPropagation(); codex.editCard('${id}')" title="编辑">✏️</button>
+                        <button class="action-btn delete" onclick="event.stopPropagation(); codex.deleteCard('${id}')" title="删除">🗑️</button>
+                    </div>
+                    <div class="card-icon">${typeInfo.icon}</div>
+                    <div class="card-header">
+                        <div class="card-name">${displayName}</div>
+                        <div class="card-type">${typeInfo.label} · ${rarityInfo.label}</div>
+                    </div>
+                    <div class="card-preview">
+                        ${previewStats.join('') || '<span class="preview-stat">📖 查看详情</span>'}
+                    </div>
+                `;
+
+                el.addEventListener('mouseenter', (e) => this.showTooltip(e, card, typeInfo, rarityInfo, id));
+                el.addEventListener('mouseleave', () => this.hideTooltip());
+                el.addEventListener('mousemove', (e) => this.moveTooltip(e));
+
+                el.addEventListener('click', (e) => {
+                    if (!e.target.closest('.action-btn')) {
+                        this.editCard(id);
+                    }
+                });
+
+                el.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    this.deleteCard(id);
+                });
+
+                return el;
+            }
+
+            showTooltip(e, card, typeInfo, rarityInfo, cardKey) {
+                const parsedDesc = this.parseDescription(card.desc, card);
+                this.tooltip.style.setProperty('--tooltip-color', rarityInfo.color);
+                this.tooltip.style.setProperty('--tooltip-glow', rarityInfo.color + '80');
+
+                const stats = [];
+                if (card.gold) stats.push({ icon: '💰', label: '价格', value: card.gold });
+                if (card.damage) stats.push({ icon: '⚔️', label: '伤害', value: card.damage });
+                if (card.hit) stats.push({ icon: '🎯', label: '命中', value: card.hit + '%' });
+                if (card.mp) stats.push({ icon: '💧', label: 'MP', value: card.mp });
+                if (card.ap) stats.push({ icon: '⚡', label: 'AP', value: card.ap });
+
+                // 使用映射表渲染职业标签 - 独立区块
+                const careerSection = (card.career || []).length > 0 ? `
+                    <div class="tooltip-section" style="margin-top: 0.75rem;">
+                        <div class="section-label" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.3rem;">
+                            <span>👥</span> 适用职业
+                        </div>
+                        <div class="tooltip-tags">
+                            ${card.career.map(c => {
+                    const info = careerMap[c] || { label: c, color: '#ff5588' };
+                    return `<span class="tag" style="background: linear-gradient(135deg, ${info.color}33, transparent); border-color: ${info.color}4d; color: ${info.color};">${info.icon || ''} ${info.label}</span>`;
+                }).join('')}
+                        </div>
+                    </div>
+                ` : '';
+
+                // 使用映射表渲染元素标签 - 独立区块
+                const tagSection = (card.tag || []).length > 0 ? `
+                    <div class="tooltip-section" style="margin-top: 0.75rem;">
+                        <div class="section-label" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.3rem;">
+                            <span>🔮</span> 元素属性
+                        </div>
+                        <div class="tooltip-tags">
+                            ${card.tag.map(t => {
+                    const info = tagMap[t] || { label: t, color: '#55aaff' };
+                    return `<span class="tag" style="background: linear-gradient(135deg, ${info.color}33, transparent); border-color: ${info.color}4d; color: ${info.color};">${info.icon || ''} ${info.label}</span>`;
+                }).join('')}
+                        </div>
+                    </div>
+                ` : '';
+
+
+
+                this.tooltip.innerHTML = `
+                    <div class="tooltip-header">
+                        <div class="tooltip-icon" style="border-color: ${rarityInfo.color}">${typeInfo.icon}</div>
+                        <div class="tooltip-title-group">
+                            <div class="tooltip-title" style="background: linear-gradient(90deg, ${rarityInfo.color}, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${card.name}</div>
+                            <div class="tooltip-meta">
+                                <span class="rarity-tag" style="border-color: ${rarityInfo.color}; background: linear-gradient(135deg, ${rarityInfo.color}, transparent);">${rarityInfo.label}</span>
+                                <span>${typeInfo.label}</span>
+                            </div>
+                        </div>
+                                      <div class="tooltip-key">${cardKey}</div>
+                    </div>
+                    <div class="tooltip-desc">${parsedDesc}</div>
+                    ${stats.length ? `<div class="tooltip-stats">${stats.map(s => `
+                        <div class="stat-row">
+                            <span class="stat-label">${s.icon} ${s.label}</span>
+                            <span class="stat-value" style="color: ${rarityInfo.color}">${s.value}</span>
+                        </div>
+                    `).join('')}</div>` : ''}
+                    ${card.cooldown ? `<div class="cooldown-indicator"><span>⏱️</span><span>冷却: ${card.cooldown}秒</span></div>` : ''}
+                    ${careerSection}
+                    ${tagSection}
+                `;
+                this.tooltip.classList.add('visible');
+                this.positionTooltip(e);
+            }
+
+            moveTooltip(e) { this.positionTooltip(e); }
+
+            positionTooltip(e) {
+                const rect = this.tooltip.getBoundingClientRect();
+                let left = e.clientX + 20;
+                let top = e.clientY + 20;
+                if (left + rect.width > window.innerWidth - 20) left = e.clientX - rect.width - 20;
+                if (top + rect.height > window.innerHeight - 20) top = e.clientY - rect.height - 20;
+                this.tooltip.style.left = Math.max(20, left) + 'px';
+                this.tooltip.style.top = Math.max(20, top) + 'px';
+            }
+
+            hideTooltip() { this.tooltip.classList.remove('visible'); }
+
+            render() {
+                const grid = document.getElementById('cardGrid');
+                grid.innerHTML = '';
+
+                const filteredCards = this.getFilteredCards();
+
+                if (filteredCards.length === 0) {
+                    if (this.cards.size === 0) {
+                        grid.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">🎴</div>
+                                <div>暂无卡牌数据，点击上方"新建卡牌"开始创建</div>
+                            </div>`;
+                    } else if (this.searchQuery) {
+                        // 搜索无结果
+                        grid.innerHTML = `
+                            <div class="search-no-result">
+                                <div class="search-no-result-icon">🔍</div>
+                                <div>未找到包含 "<strong>${this.escapeHtml(this.searchQuery)}</strong>" 的卡牌</div>
+                                <div class="search-suggestion">
+                                    尝试搜索：<br>
+                                    • 卡牌名称（如：烈焰、治愈）<br>
+                                    • 描述关键词（如：伤害、恢复）<br>
+                                    • 类型（如：武器、法术）<br>
+                                    • 稀有度（如：传说、史诗）<br>
+                                    • 职业或元素标签
+                                </div>
+                            </div>`;
+                    } else {
+                        grid.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">🔍</div>
+                                <div>没有找到匹配的卡牌<br><small>请尝试调整筛选条件</small></div>
+                            </div>`;
+                    }
+                    return;
+                }
+
+                filteredCards.forEach(([id, card]) => {
+                    grid.appendChild(this.createCardElement(id, card));
                 });
             }
 
-            /* 在打开弹窗时绑一次即可 */
-            const originalEditCard = editCard;
-            editCard = function (key) {
-                originalEditCard(key);
-                bindLivePreview();   // 关键：绑定实时刷新
-            };
-            /* ============ 原有字典表 ============ */
-            const CardType = { attack: "攻击", equipment: "装备", magic: "法术", spell: "咒语", pet: "宠物", weapon: "武器", shield: "盾牌", food: "食物", accessories: "饰品", magicbook: "魔法书", armor: "护甲", potion: "药水", magicScroll: "魔法卷轴", skill: "技能", career: "职业" };
-            const CardRarity = { common: "普通", special: "特殊", exclusive: "专属", rare: "罕见", epic: "史诗", legendary: "传说", mythic: "神话" };
-            const rarityClass = { common: "rarity-common", special: "rarity-special", rare: "rare", epic: "epic", legendary: "legendary", mythic: "mythic" };
-            const CardCareer = { all: "通用", warrior: "战士", mage: "法师" };
-            const Tag = { ice: "冰系", book: "书", fire: "火系" };
-            const TagColor = { ice: '#1890ff', book: '#52c41a', fire: '#ff4d4f' };
-            const CareerColor = { all: '#722ed1', warrior: '#fa541c', mage: '#13c2c2' };
-
-            function injectColorStyles() {
-                const style = document.createElement('style');
-                style.dataset.dynamic = 'true';
-                let css = '';
-                Object.entries(TagColor).forEach(([k, c]) => css += `.tag-${k}::before{background:${c}!important;}`);
-                Object.entries(CareerColor).forEach(([k, c]) => css += `.career-${k}::before{background:${c}!important;}`);
-                style.textContent = css;
-                document.head.appendChild(style);
-            }
-
-            /* ============ 数据容器 ============ */
-            let cardsData = {}, filteredCards = {};
-            let editingKey = null;
-
-
-
-            /* ============ 初始化筛选 ============ */
-            function initFilters() {
-                const typeFilter = document.getElementById('typeFilter');
-                typeFilter.innerHTML = '<option value="">全部类型</option>';
-                [...new Set(Object.values(cardsData).map(c => c.type).filter(Boolean))].forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = CardType[t] || t; typeFilter.appendChild(o); });
-
-                const roleFilter = document.getElementById('roleFilter');
-                roleFilter.innerHTML = '<option value="">全部职业</option>';
-                [...new Set(Object.values(cardsData).flatMap(c => c.career || ['all']))].forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = CardCareer[r] || r; roleFilter.appendChild(o); });
-
-                const tagBox = document.getElementById('tagFilters');
-                [...new Set(Object.values(cardsData).flatMap(c => c.tag || []))].forEach(t => { const label = document.createElement('label'); label.innerHTML = `<input type="checkbox" value="${t}" onchange="filterCards()"> ${Tag[t] || t}`; tagBox.appendChild(label); });
-
-                const rarityBox = document.getElementById('rarityFilters');
-                Object.keys(CardRarity).forEach(r => { const label = document.createElement('label'); label.innerHTML = `<input type="checkbox" value="${r}" onchange="filterCards()"> ${CardRarity[r]}`; rarityBox.appendChild(label); });
-            }
-
-            /* ============ 筛选逻辑 ============ */
-            function filterCards() {
-                const search = document.getElementById('searchInput').value.trim().toLowerCase();
-                const typeF = document.getElementById('typeFilter').value;
-                const roleF = document.getElementById('roleFilter').value;
-                const checkedTags = [...document.querySelectorAll('#tagFilters input:checked')].map(i => i.value);
-                const checkedRarities = [...document.querySelectorAll('#rarityFilters input:checked')].map(i => i.value);
-
-                filteredCards = {};
-                Object.entries(cardsData).forEach(([k, c]) => {
-                    if (search && !c.name.toLowerCase().includes(search) && !c.desc.toLowerCase().includes(search)) return;
-                    if (typeF && c.type !== typeF) return;
-                    if (roleF && (!c.career || !c.career.includes(roleF))) return;
-                    if (checkedTags.length && !checkedTags.some(t => (c.tag || []).includes(t))) return;
-                    if (checkedRarities.length && !checkedRarities.includes(c.rarity || 'common')) return;
-                    filteredCards[k] = c;
-                });
-                displayCards(filteredCards);
-            }
-
-            /* ============ 渲染卡牌 ============ */
-            function displayCards(cards) {
-                const box = document.getElementById('cardsContainer');
-                box.innerHTML = '';
-                if (Object.keys(cards).length === 0) { box.innerHTML = '<div class="no-results">没有找到匹配的卡牌</div>'; return; }
-                Object.entries(cards).forEach(([k, c]) => box.appendChild(createCard(k, c)));
-            }
-            function createCard(key, c) {
+            // HTML转义，防止XSS
+            escapeHtml(text) {
                 const div = document.createElement('div');
-                div.className = 'card';
-                div.style.cursor = 'pointer';
-                div.onclick = () => editCard(key);
-
-                const typeTxt = CardType[c.type] || c.type || '无类型';
-                const rarity = c.rarity || 'common';
-                const tagTxt = (c.tag || []).map(t => `<span class="tag tag-${t}">${Tag[t] || t}</span>`).join('');
-                const careerTxt = (c.career || ['all']).map(id => `<span class="career career-${id}">${CardCareer[id] || id}</span>`).join('');
-
-                const line1 = [];
-                const line2 = [];
-                if (c.damage != null) line1.push(`⚔ 伤害 ${c.damage}`);
-                if (c.hit != null) line1.push(`🎯 命中 ${c.hit}`);
-                if (c.cooldown != null) line1.push(`❄ 冷却 ${c.cooldown}s`);
-                if (c.gold != null) line1.push(`💰 价值 ${c.gold}`);
-                if (c.mp != null) line2.push(`🔮 MP ${c.mp}`);
-                if (c.ap != null) line2.push(`⚡ AP ${c.ap}`);
-
-                div.innerHTML = `
-        <div class="card-header">
-            <h3 class="card-name">${c.name}</h3>
-            <span class="card-type ${rarityClass[rarity]}">${typeTxt}</span>
-        </div>
-        <div>描述：</div>
-        <p class="card-desc">${c.desc}</p>
-        <div>属性：</div>
-        ${line1.length ? `<div class="card-stats">${line1.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
-        <div>消耗：</div>
-        ${line2.length ? `<div class="card-stats">${line2.map(s => `<div class="stat"><span class="stat-icon">${s}</span></div>`).join('')}</div>` : ''}
-        <div>标签：</div>${tagTxt ? `<div class="card-line">${tagTxt}</div>` : ''}
-        <strong>职业</strong>${careerTxt ? `<div class="card-line">${careerTxt}</div>` : ''}`;
-                return div;
+                div.textContent = text;
+                return div.innerHTML;
             }
 
-            /* ============================== */
-            /* =====  以下为新管理逻辑  ====== */
-            /* ============================== */
+            openModal(id = null) {
+                this.currentEditId = id;
+                document.getElementById('modalTitle').textContent = id ? '✏️ 编辑卡牌' : '➕ 新建卡牌';
+                document.getElementById('cardModal').classList.add('active');
 
-            /* ---------- data 对象 ---------- */
-            function renderDataList() {
-                const box = document.getElementById('dataList');
-                box.innerHTML = '';
-                const data = cardsData[editingKey].data || {};
-                Object.entries(data).forEach(([k, v]) => {
-                    const row = document.createElement('div');
-                    row.className = 'obj-row';
-                    row.innerHTML = `
-            <input placeholder="key" value="${k}" onchange="changeDataKey('${k}',this.value)">
-            <input placeholder="value" value="${v}" onchange="changeDataVal('${k}',this.value)">
-            <button onclick="delDataKV('${k}')">删除</button>`;
-                    box.appendChild(row);
+                const keyInput = document.getElementById('cardKey');
+                const keyHint = document.getElementById('keyHint');
+
+                if (id) {
+                    const card = this.cards.get(id);
+                    keyInput.value = id;
+                    keyInput.disabled = true; // 编辑时锁定 Key
+                    keyHint.textContent = '编辑模式下 Key 不可修改';
+                    keyHint.className = 'key-input-hint';
+
+                    document.getElementById('cardName').value = card.name || '';
+                    document.getElementById('cardType').value = card.type || 'attack';
+                    document.getElementById('cardRarity').value = card.rarity || 'common';
+                    document.getElementById('cardDesc').value = card.desc || '';
+                    document.getElementById('cardGold').value = card.gold || 0;
+                    document.getElementById('cardDamage').value = card.damage || 0;
+                    document.getElementById('cardMp').value = card.mp || '';
+                    document.getElementById('cardAp').value = card.ap || '';
+                    document.getElementById('cardHit').value = card.hit || 100;
+                    document.getElementById('cardCooldown').value = card.cooldown || 0;
+                    // 初始化键值对编辑器
+                    this.kvData = card.data || {};
+                    this.renderKVList();
+                    this.syncFullCardToJson();
+
+                    // 设置复选框状态
+                    this.setCheckedValues('career', card.career || []);
+                    this.setCheckedValues('tag', card.tag || []);
+                } else {
+                    document.getElementById('cardForm').reset();
+                    keyInput.value = '';
+                    keyInput.disabled = false; // 新建时可编辑
+                    keyHint.textContent = '新建卡牌时填写，保存后不可修改';
+                    keyHint.className = 'key-input-hint';
+
+                    // 清空所有复选框
+                    this.setCheckedValues('career', []);
+                    this.setCheckedValues('tag', []);
+                    // 初始化空的键值对编辑器
+                    this.kvData = {};
+                    this.renderKVList();
+
+                    // 延迟同步JSON，确保表单重置完成
+                    setTimeout(() => this.syncFullCardToJson(), 0);
+                }
+            }
+
+            closeModal() {
+                document.getElementById('cardModal').classList.remove('active');
+                this.currentEditId = null;
+            }
+
+            closeModalOnOverlay(e) {
+                if (e.target === e.currentTarget) this.closeModal();
+            }
+
+            saveCard(e) {
+                e.preventDefault();
+
+                const keyInput = document.getElementById('cardKey');
+                const cardKey = keyInput.value.trim();
+
+                // 验证 Key
+                if (!cardKey) {
+                    alert('请输入卡牌 Key（唯一标识符）');
+                    keyInput.focus();
+                    return;
+                }
+
+                if (!/^[a-zA-Z0-9_]+$/.test(cardKey)) {
+                    alert('Key 只能包含字母、数字和下划线');
+                    keyInput.focus();
+                    return;
+                }
+
+                // 检查 Key 是否冲突
+                if (!this.currentEditId && this.cards.has(cardKey)) {
+                    alert(`Key "${cardKey}" 已被使用，请更换`);
+                    keyInput.focus();
+                    return;
+                }
+
+                const card = {
+                    name: document.getElementById('cardName').value,
+                    type: document.getElementById('cardType').value,
+                    rarity: document.getElementById('cardRarity').value,
+                    desc: document.getElementById('cardDesc').value,
+                    gold: parseInt(document.getElementById('cardGold').value) || 0,
+                    damage: parseInt(document.getElementById('cardDamage').value) || 0,
+                    mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
+                    ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
+                    hit: parseInt(document.getElementById('cardHit').value) || 100,
+                    cooldown: parseFloat(document.getElementById('cardCooldown').value) || 0,
+                    career: this.getCheckedValues('career'),
+                    tag: this.getCheckedValues('tag'),
+                    data: {}
+                };
+
+                // 从JSON预览框获取最终数据（因为它是实时同步的源头）
+                try {
+                    const dataStr = document.getElementById('cardData').value.trim();
+                    if (dataStr) {
+                        card.data = JSON.parse(dataStr);
+                    }
+                } catch (err) {
+                    alert('数据变量格式错误，请使用正确的JSON格式');
+                    return;
+                }
+
+                // 如果是编辑模式且 Key 变了，删除旧的
+                if (this.currentEditId && this.currentEditId !== cardKey) {
+                    this.cards.delete(this.currentEditId);
+                }
+
+                this.cards.set(cardKey, card);
+                this.saveStorage();
+                this.updateFilterOptions();
+                this.render();
+                this.closeModal();
+                this.showToast(this.currentEditId ? '卡牌已更新' : '卡牌已创建');
+                // 云同步会在saveStorage中自动触发
+            }
+
+            editCard(id) {
+                this.openModal(id);
+            }
+
+            deleteCard(id) {
+                const card = this.cards.get(id);
+                document.getElementById('confirmText').textContent = `确定要删除 "${card.name || '未命名'}" (${id}) 吗？此操作无法撤销。`;
+                this.deleteTargetId = id;
+                document.getElementById('confirmModal').classList.add('active');
+            }
+
+            confirmDelete() {
+                if (this.deleteTargetId) {
+                    this.cards.delete(this.deleteTargetId);
+                    this.saveStorage();
+                    this.updateFilterOptions();
+                    this.render();
+                    this.showToast('卡牌已删除');
+                }
+                this.closeConfirm();
+            }
+
+            closeConfirm() {
+                document.getElementById('confirmModal').classList.remove('active');
+                this.deleteTargetId = null;
+            }
+
+            closeConfirmOnOverlay(e) {
+                if (e.target === e.currentTarget) this.closeConfirm();
+            }
+
+            exportData() {
+                const data = Object.fromEntries(this.cards);
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cards_${new Date().toISOString().slice(0, 10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                this.showToast('数据已导出');
+            }
+
+            importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (typeof data === 'object' && data !== null) {
+                                this.cards = new Map(Object.entries(data));
+                                this.saveStorage();
+                                this.updateFilterOptions();
+                                this.render();
+                                this.renderFilters();
+                                this.showToast(`成功导入 ${this.cards.size} 张卡牌`);
+                                // 导入后自动同步到云端
+                            } else {
+                                throw new Error('Invalid format');
+                            }
+                        } catch (err) {
+                            alert('文件格式错误，请上传有效的JSON文件');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+
+            resetData() {
+                if (confirm('确定要重置为默认数据吗？当前所有自定义卡牌将丢失。')) {
+                    localStorage.removeItem('cardCodexData');
+                    this.cards = new Map(Object.entries(defaultData));
+                    this.activeFilters = { type: new Set(), rarity: new Set(), career: new Set(), tag: new Set() };
+                    this.saveStorage();
+                    this.updateFilterOptions();
+                    this.render();
+                    this.showToast('已重置为默认数据');
+                }
+            }
+
+            showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 2rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(135deg, #00ff88, #00cc66);
+                    color: #000;
+                    padding: 1rem 2rem;
+                    border-radius: 30px;
+                    font-weight: bold;
+                    z-index: 3000;
+                    animation: slideUp 0.3s ease;
+                    box-shadow: 0 10px 30px rgba(0,255,136,0.3);
+                `;
+                toast.textContent = '✓ ' + message;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2000);
+            }
+
+            // ==================== 搜索功能 ====================
+
+            // 搜索输入处理
+            onSearchInput() {
+                const input = document.getElementById('searchInput');
+                const clearBtn = document.getElementById('searchClear');
+                this.searchQuery = input.value.trim().toLowerCase();
+
+                // 显示/隐藏清除按钮
+                clearBtn.style.display = this.searchQuery ? 'flex' : 'none';
+
+                this.render();
+                this.updateFilterStats();
+            }
+
+            // 清除搜索
+            clearSearch() {
+                const input = document.getElementById('searchInput');
+                const clearBtn = document.getElementById('searchClear');
+                input.value = '';
+                this.searchQuery = '';
+                clearBtn.style.display = 'none';
+                this.render();
+                this.updateFilterStats();
+                input.focus();
+            }
+
+            // 检查卡牌是否匹配搜索
+            matchesSearch(card, query) {
+                if (!query) return true;
+
+                // 搜索字段：名称、描述、Key、类型、稀有度、职业、标签
+                const searchFields = [
+                    card.name,
+                    card.desc,
+                    card.type,
+                    card.rarity,
+                    ...(card.career || []),
+                    ...(card.tag || [])
+                ];
+
+                // 检查是否有字段包含搜索词
+                return searchFields.some(field => {
+                    if (!field) return false;
+                    return field.toLowerCase().includes(query);
                 });
             }
-            function addDataKV() {
-                const data = cardsData[editingKey].data ||= {};
-                let newKey = 'amount';
-                let cnt = 0;
-                while (newKey in data) { newKey = 'amount' + (++cnt); }  // 防重键
-                data[newKey] = '';
-                renderDataList();
-                syncJsonPreview();
-            }
-            function delDataKV(key) {
-                delete cardsData[editingKey].data[key];
-                renderDataList();
-                syncJsonPreview();
-            }
-            function changeDataKey(oldKey, newKey) {
-                const data = cardsData[editingKey].data;
-                if (newKey === '' || newKey === oldKey) return;
-                if (newKey in data) { alert('键已存在'); renderDataList(); return; }
-                data[newKey] = data[oldKey];
-                delete data[oldKey];
-                renderDataList();
-                syncJsonPreview();
-            }
-            function changeDataVal(key, val) {
-                cardsData[editingKey].data[key] = val;
-                syncJsonPreview();
+
+            // 高亮匹配文本
+            highlightText(text, query) {
+                if (!query || !text) return text;
+                const regex = new RegExp(`(${query})`, 'gi');
+                return text.replace(regex, '<span class="search-match">$1</span>');
             }
 
-            /* ---------- tag 数组 ---------- */
-            function renderTagList() {
-                const box = document.getElementById('tagList');
-                box.innerHTML = '';
-                const arr = cardsData[editingKey].tag || [];
-                arr.forEach((v, idx) => {
-                    const row = document.createElement('div');
-                    row.className = 'array-row';
-                    row.innerHTML = `
-            <input value="${v}" onchange="changeTagItem(${idx},this.value)">
-            <button onclick="delTagItem(${idx})">删除</button>`;
-                    box.appendChild(row);
-                });
-            }
-            function addTagItem() {
-                const arr = cardsData[editingKey].tag ||= [];
-                arr.push('newTag');
-                renderTagList();
-                syncJsonPreview();
-            }
-            function delTagItem(idx) {
-                cardsData[editingKey].tag.splice(idx, 1);
-                renderTagList();
-                syncJsonPreview();
-            }
-            function changeTagItem(idx, val) {
-                cardsData[editingKey].tag[idx] = val;
-                syncJsonPreview();
+            // 更新筛选统计（包含搜索）
+            updateFilterStats() {
+                const visibleCount = this.getFilteredCards().length;
+                const totalCount = this.cards.size;
+                const statsEl = document.getElementById('filterStats');
+
+                if (this.searchQuery || this.hasActiveFilters()) {
+                    statsEl.textContent = `找到 ${visibleCount} / ${totalCount} 张卡牌`;
+                } else {
+                    statsEl.textContent = `共 ${totalCount} 张卡牌`;
+                }
             }
 
-            /* ---------- career 数组 ---------- */
-            function renderCareerList() {
-                const box = document.getElementById('careerList');
-                box.innerHTML = '';
-                const arr = cardsData[editingKey].career || [];
-                arr.forEach((v, idx) => {
-                    const row = document.createElement('div');
-                    row.className = 'array-row';
-                    row.innerHTML = `
-            <input value="${v}" onchange="changeCareerItem(${idx},this.value)">
-            <button onclick="delCareerItem(${idx})">删除</button>`;
-                    box.appendChild(row);
-                });
-            }
-            function addCareerItem() {
-                const arr = cardsData[editingKey].career ||= [];
-                arr.push('all');
-                renderCareerList();
-                syncJsonPreview();
-            }
-            function delCareerItem(idx) {
-                cardsData[editingKey].career.splice(idx, 1);
-                renderCareerList();
-                syncJsonPreview();
-            }
-            function changeCareerItem(idx, val) {
-                cardsData[editingKey].career[idx] = val;
-                syncJsonPreview();
+            // ==================== 云同步功能 ====================
+
+            // 从localStorage加载云配置
+            loadCloudConfig() {
+                const saved = localStorage.getItem('cardCodexCloudConfig');
+                return saved ? JSON.parse(saved) : null;
             }
 
-            /* ---------- 打开 / 关闭弹窗 ---------- */
-            /* 通用下拉框生成 */
-            function initSelect(domId, dict, current) {
-                const sel = document.getElementById(domId);
-                sel.innerHTML = '';                       // 清空
-                Object.entries(dict).forEach(([k, v]) => {
-                    const opt = document.createElement('option');
-                    opt.value = k;
-                    opt.textContent = v;
-                    if (k === current) opt.selected = true;
-                    sel.appendChild(opt);
-                });
-            }
-            function editCard(key) {
-
-                editingKey = key;
-                fillForm();
-                renderDataList();
-                renderTagList();
-                renderCareerList();
-                syncJsonPreview();
-                /* —— 新增：初始化 type / rarity —— */
-                initSelect('editType', CardType, cardsData[key].type || 'attack');
-                initSelect('editRarity', CardRarity, cardsData[key].rarity || 'common');
-                document.getElementById('editModal').style.display = 'flex';
-            }
-            function closeEdit() {
-                document.getElementById('editModal').style.display = 'none';
-                editingKey = null;
-            }
-            function saveEdit() {
-                if (!editingKey) return;
-                const c = cardsData[editingKey];
-                c.name = document.getElementById('editName').value.trim() || c.name;
-                c.desc = document.getElementById('editDesc').value.trim() || c.desc;
-                c.damage = toNum(document.getElementById('editDamage').value);
-                c.hit = toNum(document.getElementById('editHit').value);
-                c.cooldown = toNum(document.getElementById('editCooldown').value);
-                c.gold = toNum(document.getElementById('editGold').value);
-                c.mp = toNum(document.getElementById('editMp').value);
-                c.ap = toNum(document.getElementById('editAp').value);
-                /* 新增两行 */
-                c.type = document.getElementById('editType').value;
-                c.rarity = document.getElementById('editRarity').value;
-                closeEdit();
-                filterCards();
-            }
-            function toNum(v) { return v === '' ? undefined : Number(v); }
-
-            /* ---------- JSON 实时预览 ---------- */
-            function syncJsonPreview() {
-                if (!editingKey) return;
-                document.getElementById('jsonPreview').value = JSON.stringify(cardsData[editingKey], null, 2);
-            }
-            function fillForm() {
-                const c = cardsData[editingKey];
-                document.getElementById('editName').value = c.name;
-                document.getElementById('editDesc').value = c.desc;
-                document.getElementById('editDamage').value = c.damage ?? '';
-                document.getElementById('editHit').value = c.hit ?? '';
-                document.getElementById('editCooldown').value = c.cooldown ?? '';
-                document.getElementById('editGold').value = c.gold ?? '';
-                document.getElementById('editMp').value = c.mp ?? '';
-                document.getElementById('editAp').value = c.ap ?? '';
+            // 保存云配置
+            saveCloudConfigToStorage(config) {
+                localStorage.setItem('cardCodexCloudConfig', JSON.stringify(config));
+                this.cloudConfig = config;
             }
 
-            /* ============ 事件绑定（保持原样） ============ */
-            document.getElementById('searchInput').addEventListener('input', filterCards);
-            document.getElementById('typeFilter').addEventListener('change', filterCards);
-            document.getElementById('roleFilter').addEventListener('change', filterCards);
+            // 获取或创建用户ID（Supabase使用自定义ID，无需登录）
+            getOrCreateUserId() {
+                let userId = localStorage.getItem('cardCodexUserId');
+                if (!userId) {
+                    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('cardCodexUserId', userId);
+                }
+                return userId;
+            }
+
+            // 初始化云同步
+            async initCloudSync() {
+                // 检查SDK是否加载完成
+                if (!window.supabaseModule || !window.supabaseModule.createClient) {
+                    console.log('等待Supabase SDK加载...');
+                    this.updateCloudStatus('disconnected', 'SDK加载中...');
+                    // 2秒后重试
+                    setTimeout(() => this.initCloudSync(), 2000);
+                    return;
+                }
+
+                if (!this.cloudConfig) {
+                    this.updateCloudStatus('disconnected', '点击配置云端');
+                    return;
+                }
+
+                await this.connectToCloud();
+            }
+
+            // 连接到Supabase
+            async connectToCloud() {
+                // 再次检查SDK
+                if (!window.supabaseModule || !window.supabaseModule.createClient) {
+                    console.error('Supabase SDK未加载');
+                    this.updateCloudStatus('error', 'SDK未加载');
+                    return;
+                }
+
+                const { createClient } = window.supabaseModule;
+
+                try {
+                    this.updateCloudStatus('syncing', '连接中...');
+
+                    // 创建Supabase客户端
+                    this.supabase = createClient(this.cloudConfig.url, this.cloudConfig.key);
+
+                    // 设置实时订阅
+                    this.setupRealtimeSubscription();
+
+                    // 立即同步一次
+                    await this.syncFromCloud();
+
+                    this.isCloudSyncEnabled = true;
+                    this.updateCloudStatus('connected', '已连接');
+                    this.showToast('云端连接成功');
+
+                } catch (error) {
+                    console.error('Supabase连接失败:', error);
+                    this.updateCloudStatus('error', '连接失败');
+                    this.showToast('云端连接失败，使用本地存储');
+                }
+            }
+
+            // 设置实时订阅
+            setupRealtimeSubscription() {
+                this.syncChannel = this.supabase
+                    .channel('card_codex_changes')
+                    .on('postgres_changes', 
+                        { 
+                            event: '*', 
+                            schema: 'public', 
+                            table: 'card_codex_data',
+                            filter: `user_id=eq.${this.userId}`
+                        }, 
+                        (payload) => {
+                            console.log('收到云端更新:', payload);
+                            this.handleCloudUpdate(payload);
+                        }
+                    )
+                    .subscribe();
+            }
+
+            // 处理云端更新
+            handleCloudUpdate(payload) {
+                // 避免自己上传的数据被重复处理
+                const now = Date.now();
+                if (now - this.lastSyncTime < 5000) return; // 5秒内忽略
+
+                if (payload.new && payload.new.cards) {
+                    const cloudCards = payload.new.cards;
+
+                    // 简单合并策略：云端优先
+                    this.cards = new Map(Object.entries(cloudCards));
+                    this.saveToLocalOnly(); // 只保存到本地，不触发上传
+                    this.updateFilterOptions();
+                    this.render();
+                    this.showToast('已同步云端更新');
+                }
+            }
+
+            // 从云端同步数据
+            async syncFromCloud() {
+                try {
+                    const { data, error } = await this.supabase
+                        .from('card_codex_data')
+                        .select('cards, updated_at')
+                        .eq('user_id', this.userId)
+                        .single();
+
+                    if (error) {
+                        if (error.code === 'PGRST116') {
+                            // 没有数据，上传本地数据
+                            await this.syncToCloudImmediate();
+                        } else {
+                            throw error;
+                        }
+                    } else if (data && data.cards) {
+                        // 合并数据（云端优先）
+                        this.cards = new Map(Object.entries(data.cards));
+                        this.saveToLocalOnly();
+                        this.updateFilterOptions();
+                        this.render();
+                    }
+                } catch (error) {
+                    console.error('从云端同步失败:', error);
+                }
+            }
+
+            // 同步数据到云端（带防抖）
+            syncToCloud() {
+                if (!this.isCloudSyncEnabled || !this.supabase) return;
+
+                // 清除之前的定时器
+                if (this.syncDebounceTimer) {
+                    clearTimeout(this.syncDebounceTimer);
+                }
+
+                // 显示同步中状态
+                this.updateCloudStatus('syncing', '同步中...');
+
+                // 2秒后执行同步（防抖）
+                this.syncDebounceTimer = setTimeout(() => {
+                    this.syncToCloudImmediate();
+                }, 2000);
+            }
+
+            // 立即同步到云端
+            async syncToCloudImmediate() {
+                if (!this.supabase) return;
+
+                try {
+                    const data = Object.fromEntries(this.cards);
+                    const { error } = await this.supabase
+                        .from('card_codex_data')
+                        .upsert({
+                            user_id: this.userId,
+                            cards: data,
+                            updated_at: new Date().toISOString()
+                        }, {
+                            onConflict: 'user_id'
+                        });
+
+                    if (error) throw error;
+
+                    this.lastSyncTime = Date.now();
+                    this.updateCloudStatus('connected', '已同步');
+                    console.log('已同步到Supabase');
+                } catch (error) {
+                    console.error('同步到云端失败:', error);
+                    this.updateCloudStatus('error', '同步失败');
+                }
+            }
+
+            // 仅保存到本地（不触发云同步）
+            saveToLocalOnly() {
+                const obj = Object.fromEntries(this.cards);
+                localStorage.setItem('cardCodexData', JSON.stringify(obj));
+            }
+
+            // 更新云同步状态UI
+            updateCloudStatus(status, text) {
+                const statusEl = document.getElementById('cloudStatus');
+                if (!statusEl) return;
+
+                const icons = {
+                    connected: '☁️',
+                    syncing: '🔄',
+                    error: '⚠️',
+                    disconnected: '☁️'
+                };
+
+                statusEl.className = 'cloud-status ' + status;
+                statusEl.innerHTML = `
+                    <span class="cloud-icon">${icons[status] || '☁️'}</span>
+                    <span class="cloud-text">${text}</span>
+                `;
+
+                // 点击打开配置面板
+                statusEl.onclick = () => this.toggleCloudConfig();
+            }
+
+            // 切换配置面板显示
+            toggleCloudConfig() {
+                const panel = document.getElementById('cloudConfigPanel');
+                panel.classList.toggle('active');
+
+                // 如果打开面板，填充已有配置
+                if (panel.classList.contains('active') && this.cloudConfig) {
+                    document.getElementById('supabaseUrl').value = this.cloudConfig.url || '';
+                    document.getElementById('supabaseKey').value = this.cloudConfig.key || '';
+                }
+            }
+
+            // 保存云配置
+            async saveCloudConfig() {
+                const url = document.getElementById('supabaseUrl').value.trim();
+                const key = document.getElementById('supabaseKey').value.trim();
+
+                if (!url || !key) {
+                    alert('请填写Project URL和API Key');
+                    return;
+                }
+
+                // 验证URL格式
+                if (!url.startsWith('https://') || !url.includes('supabase.co')) {
+                    alert('URL格式不正确，应为 https://xxxxx.supabase.co');
+                    return;
+                }
+
+                const config = { url, key };
+
+                this.saveCloudConfigToStorage(config);
+                this.toggleCloudConfig();
+
+                // 重新连接
+                if (this.syncChannel) {
+                    this.supabase.removeChannel(this.syncChannel);
+                }
+                await this.connectToCloud();
+            }
+
+            // 断开云同步
+            disconnectCloud() {
+                if (this.syncChannel) {
+                    this.supabase.removeChannel(this.syncChannel);
+                    this.syncChannel = null;
+                }
+                this.isCloudSyncEnabled = false;
+                this.supabase = null;
+                localStorage.removeItem('cardCodexCloudConfig');
+                this.cloudConfig = null;
+                this.updateCloudStatus('disconnected', '点击配置云端');
+                this.showToast('已断开云端连接');
+            }
 
 
-        </script>
+
+            // ==================== 键值对编辑器方法 ====================
+
+            // 渲染键值对列表
+            renderKVList() {
+                const container = document.getElementById('kvList');
+                const entries = Object.entries(this.kvData);
+
+                if (entries.length === 0) {
+                    container.innerHTML = '<div class="kv-empty-hint">暂无数据变量，请在下方添加</div>';
+                    return;
+                }
+
+                container.innerHTML = entries.map(([key, value], index) => `
+                    <div class="kv-item" data-key="${key}">
+                        <input type="text" class="kv-item-key" value="${key}" 
+                            onchange="codex.updateKVKey('${key}', this.value)"
+                            placeholder="键名">
+                        <span style="color: rgba(255,255,255,0.3)">:</span>
+                        <input type="text" class="kv-item-value" value="${value}" 
+                            oninput="codex.updateKVValue('${key}', this.value)"
+                            placeholder="值">
+                        <button type="button" class="kv-delete" onclick="codex.deleteKV('${key}')" title="删除">×</button>
+                    </div>
+                `).join('');
+            }
+
+            // 添加键值对
+            addKV() {
+                const keyInput = document.getElementById('newKey');
+                const valueInput = document.getElementById('newValue');
+                const key = keyInput.value.trim();
+                const value = valueInput.value.trim();
+
+                if (!key) {
+                    keyInput.focus();
+                    keyInput.style.borderColor = '#ff0055';
+                    setTimeout(() => keyInput.style.borderColor = '', 500);
+                    return;
+                }
+
+                // 检查键名是否已存在
+                if (this.kvData.hasOwnProperty(key)) {
+                    if (!confirm(`键 "${key}" 已存在，是否覆盖？`)) {
+                        return;
+                    }
+                }
+
+                // 尝试解析值为数字
+                let parsedValue = value;
+                if (value && !isNaN(value) && value !== '') {
+                    parsedValue = Number(value);
+                }
+
+                this.kvData[key] = parsedValue;
+                this.renderKVList();
+                this.syncFullCardToJson();
+
+                // 清空输入框
+                keyInput.value = '';
+                valueInput.value = '';
+                keyInput.focus();
+            }
+
+            // 更新键名
+            updateKVKey(oldKey, newKey) {
+                newKey = newKey.trim();
+                if (!newKey || oldKey === newKey) {
+                    this.renderKVList(); // 恢复原状
+                    return;
+                }
+
+                if (this.kvData.hasOwnProperty(newKey)) {
+                    alert(`键 "${newKey}" 已存在`);
+                    this.renderKVList(); // 恢复原状
+                    return;
+                }
+
+                // 创建新键，删除旧键
+                this.kvData[newKey] = this.kvData[oldKey];
+                delete this.kvData[oldKey];
+
+                this.renderKVList();
+                this.syncFullCardToJson();
+            }
+
+            // 更新值
+            updateKVValue(key, value) {
+                // 尝试解析为数字
+                let parsedValue = value;
+                if (value && !isNaN(value) && value !== '') {
+                    parsedValue = Number(value);
+                }
+
+                this.kvData[key] = parsedValue;
+                this.syncFullCardToJson();
+            }
+
+            // 删除键值对
+            deleteKV(key) {
+                delete this.kvData[key];
+                this.renderKVList();
+                this.syncFullCardToJson();
+            }
+
+            // 同步完整卡牌数据到JSON预览
+            syncFullCardToJson() {
+                const jsonTextarea = document.getElementById('cardData');
+
+                // 构建完整的卡牌对象
+                const fullCard = this.buildCardObjectFromForm();
+
+                jsonTextarea.value = JSON.stringify(fullCard, null, 2);
+            }
+
+            // 从表单构建卡牌对象
+            buildCardObjectFromForm() {
+                const card = {
+                    name: document.getElementById('cardName').value || '',
+                    type: document.getElementById('cardType').value || 'attack',
+                    rarity: document.getElementById('cardRarity').value || 'common',
+                    desc: document.getElementById('cardDesc').value || '',
+                    gold: parseInt(document.getElementById('cardGold').value) || 0,
+                    damage: parseInt(document.getElementById('cardDamage').value) || 0,
+                    mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
+                    ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
+                    hit: parseInt(document.getElementById('cardHit').value) || 100,
+                    cooldown: parseFloat(document.getElementById('cardCooldown').value) || 0,
+                    career: this.getCheckedValues('career'),
+                    tag: this.getCheckedValues('tag'),
+                    data: this.kvData
+                };
+
+                // 清理null值，保持简洁
+                if (card.mp === null) delete card.mp;
+                if (card.ap === null) delete card.ap;
+                if (card.damage === 0) delete card.damage;
+                if (card.gold === 0) delete card.gold;
+                if (card.cooldown === 0) delete card.cooldown;
+                if (Object.keys(card.data).length === 0) delete card.data;
+                if (card.career.length === 0) delete card.career;
+                if (card.tag.length === 0) delete card.tag;
+
+                return card;
+            }
+
+            // 从完整卡牌JSON同步到表单（用户手动编辑JSON时）
+            onFullJsonInput() {
+                const jsonTextarea = document.getElementById('cardData');
+                const str = jsonTextarea.value.trim();
+
+                if (!str) {
+                    jsonTextarea.style.borderColor = '';
+                    return;
+                }
+
+                try {
+                    const parsed = JSON.parse(str);
+                    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+                        // 同步到各个表单字段
+                        this.syncJsonToForm(parsed);
+                        jsonTextarea.style.borderColor = '#00ff88';
+                        setTimeout(() => jsonTextarea.style.borderColor = '', 1000);
+                    } else {
+                        throw new Error('必须是对象类型');
+                    }
+                } catch (e) {
+                    // 解析失败，仅显示错误状态，保留用户输入
+                    jsonTextarea.style.borderColor = '#ff0055';
+                }
+            }
+
+            // 将JSON数据同步到表单
+            syncJsonToForm(card) {
+                // 同步基本字段
+                if (card.name !== undefined) document.getElementById('cardName').value = card.name;
+                if (card.type !== undefined) document.getElementById('cardType').value = card.type;
+                if (card.rarity !== undefined) document.getElementById('cardRarity').value = card.rarity;
+                if (card.desc !== undefined) document.getElementById('cardDesc').value = card.desc;
+                if (card.gold !== undefined) document.getElementById('cardGold').value = card.gold;
+                if (card.damage !== undefined) document.getElementById('cardDamage').value = card.damage;
+                if (card.mp !== undefined) document.getElementById('cardMp').value = card.mp;
+                if (card.ap !== undefined) document.getElementById('cardAp').value = card.ap;
+                if (card.hit !== undefined) document.getElementById('cardHit').value = card.hit;
+                if (card.cooldown !== undefined) document.getElementById('cardCooldown').value = card.cooldown;
+
+                // 同步复选框
+                if (card.career !== undefined) this.setCheckedValues('career', card.career);
+                if (card.tag !== undefined) this.setCheckedValues('tag', card.tag);
+
+                // 同步data到键值对编辑器
+                if (card.data !== undefined && typeof card.data === 'object') {
+                    this.kvData = { ...card.data };
+                } else {
+                    this.kvData = {};
+                }
+                this.renderKVList();
+            }
+
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                from { opacity: 0; transform: translate(-50%, 20px); }
+                to { opacity: 1; transform: translate(-50%, 0); }
+            }
+            @keyframes fadeOut {
+                to { opacity: 0; transform: translate(-50%, -20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 创建全局实例，但延迟初始化云同步
+        window.codex = new CardCodex();
+
+        // 键盘快捷键：Ctrl+F 或 / 聚焦搜索框
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+F 或 / 键
+            if ((e.ctrlKey && e.key === 'f') || (e.key === '/' && !e.ctrlKey)) {
+                e.preventDefault();
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            }
+            // ESC 清除搜索或关闭面板
+            if (e.key === 'Escape') {
+                const configPanel = document.getElementById('cloudConfigPanel');
+                if (configPanel.classList.contains('active')) {
+                    codex.toggleCloudConfig();
+                } else {
+                    codex.clearSearch();
+                }
+            }
+        });
+
+        // 网络状态监听
+        window.addEventListener('online', () => {
+            document.getElementById('offlineBanner').classList.remove('show');
+            if (codex.cloudConfig && !codex.isCloudSyncEnabled) {
+                codex.connectToCloud();
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineBanner').classList.add('show');
+            codex.updateCloudStatus('error', '离线模式');
+        });
+
+        // 初始检查网络状态
+        if (!navigator.onLine) {
+            document.getElementById('offlineBanner').classList.add('show');
+        }
+    </script>
 </body>
 
 </html>
