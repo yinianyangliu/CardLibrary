@@ -2490,11 +2490,22 @@
                     data: {}
                 };
 
-                // 从JSON预览框获取最终数据（因为它是实时同步的源头）
+                // 从JSON预览框获取最终数据（修正版）
                 try {
                     const dataStr = document.getElementById('cardData').value.trim();
                     if (dataStr) {
-                        card.data = JSON.parse(dataStr);
+                        const parsed = JSON.parse(dataStr);
+
+                        // 检查解析的是完整卡牌还是仅data部分
+                        if (parsed && typeof parsed === 'object') {
+                            if (parsed.name !== undefined || parsed.type !== undefined) {
+                                // 这是完整的卡牌JSON，提取其中的data字段
+                                card.data = parsed.data || {};
+                            } else {
+                                // 这是纯粹的data对象（兼容性处理）
+                                card.data = parsed;
+                            }
+                        }
                     }
                 } catch (err) {
                     alert('数据变量格式错误，请使用正确的JSON格式');
