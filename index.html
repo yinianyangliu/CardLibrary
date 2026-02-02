@@ -1003,7 +1003,7 @@
                 max-height: 240px;
             }
         }
-    
+
         /* 键值对编辑器样式 */
         .kv-editor {
             background: rgba(255, 255, 255, 0.03);
@@ -1376,8 +1376,15 @@
 
         /* 同步指示器动画 */
         @keyframes cloudPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .cloud-status.syncing .cloud-icon {
@@ -1417,37 +1424,37 @@
                 flex-direction: column;
             }
         }
-</style>
+    </style>
     <base target="_blank">
-<base target="_blank">
-<!-- Supabase SDK -->
-<script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
+    <base target="_blank">
+    <!-- Supabase SDK -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
 
-    // 暴露到全局供主脚本使用
-    window.supabaseModule = { createClient };
+        // 暴露到全局供主脚本使用
+        window.supabaseModule = { createClient };
 
-    // 标记SDK已加载完成
-    window.supabaseReady = true;
+        // 标记SDK已加载完成
+        window.supabaseReady = true;
 
-    // 如果codex已存在，触发初始化
-    if (window.codex && typeof window.codex.initCloudSync === 'function') {
-        window.codex.initCloudSync();
-    }
-</script>
+        // 如果codex已存在，触发初始化
+        if (window.codex && typeof window.codex.initCloudSync === 'function') {
+            window.codex.initCloudSync();
+        }
+    </script>
 
-<!-- Supabase SDK 备用加载（如果ES模块失败） -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-<script>
-    // 如果模块方式未加载成功，使用全局变量
-    if (!window.supabaseModule && window.supabase) {
-        window.supabaseModule = { 
-            createClient: window.supabase.createClient 
-        };
-    }
-</script>
-<base target="_blank">
-<base target="_blank">
+    <!-- Supabase SDK 备用加载（如果ES模块失败） -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <script>
+        // 如果模块方式未加载成功，使用全局变量
+        if (!window.supabaseModule && window.supabase) {
+            window.supabaseModule = {
+                createClient: window.supabase.createClient
+            };
+        }
+    </script>
+    <base target="_blank">
+    <base target="_blank">
 </head>
 
 <body>
@@ -1457,7 +1464,8 @@
             <h3>☁️ 云端同步设置</h3>
             <p>配置Supabase实现跨设备数据同步</p>
             <div class="config-inputs">
-                <input type="text" id="supabaseUrl" placeholder="Project URL (如: https://xxxxx.supabase.co)" class="config-input">
+                <input type="text" id="supabaseUrl" placeholder="Project URL (如: https://xxxxx.supabase.co)"
+                    class="config-input">
                 <input type="password" id="supabaseKey" placeholder="anon/public API Key" class="config-input">
             </div>
             <div class="config-actions">
@@ -1465,7 +1473,8 @@
                 <button class="btn primary btn-small" onclick="codex.saveCloudConfig()">保存并连接</button>
             </div>
             <div class="config-help">
-                <a href="https://supabase.com/docs/guides/getting-started/quickstarts/javascript" target="_blank">如何获取配置？</a>
+                <a href="https://supabase.com/docs/guides/getting-started/quickstarts/javascript"
+                    target="_blank">如何获取配置？</a>
                 <p style="margin-top: 0.5rem; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
                     1. 访问 supabase.com 创建项目<br>
                     2. 进入 Project Settings → API<br>
@@ -1512,10 +1521,10 @@
                     <span>🔍</span> 筛选与搜索
                 </div>
                 <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" 
-                        placeholder="搜索名称、描述、Key、标签..." 
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索名称、描述、Key、标签..."
                         oninput="codex.onSearchInput()">
-                    <button class="search-clear" id="searchClear" onclick="codex.clearSearch()" style="display: none;">×</button>
+                    <button class="search-clear" id="searchClear" onclick="codex.clearSearch()"
+                        style="display: none;">×</button>
                 </div>
                 <div class="filter-stats" id="filterStats">显示全部 0 张卡牌</div>
             </div>
@@ -1559,7 +1568,8 @@
 
                     <div class="form-group full">
                         <label class="form-label">📛 卡牌名称</label>
-                        <input type="text" class="form-input" id="cardName" required placeholder="输入卡牌名称" oninput="codex.syncFullCardToJson()">
+                        <input type="text" class="form-input" id="cardName" required placeholder="输入卡牌名称"
+                            oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <div class="form-group">
@@ -1603,32 +1613,38 @@
 
                     <div class="form-group">
                         <label class="form-label">💰 价格</label>
-                        <input type="number" class="form-input" id="cardGold" min="0" value="0" oninput="codex.syncFullCardToJson()">
+                        <input type="number" class="form-input" id="cardGold" min="0" value="0"
+                            oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">⚔️ 伤害</label>
-                        <input type="number" class="form-input" id="cardDamage" min="0" value="0" oninput="codex.syncFullCardToJson()">
+                        <input type="number" class="form-input" id="cardDamage" min="0" value="0"
+                            oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">💧 MP消耗</label>
-                        <input type="number" class="form-input" id="cardMp" min="0" placeholder="空为无消耗" oninput="codex.syncFullCardToJson()">
+                        <input type="number" class="form-input" id="cardMp" min="0" placeholder="空为无消耗"
+                            oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">⚡ AP消耗</label>
-                        <input type="number" class="form-input" id="cardAp" min="0" placeholder="空为无消耗" oninput="codex.syncFullCardToJson()">
+                        <input type="number" class="form-input" id="cardAp" min="0" placeholder="空为无消耗"
+                            oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">🎯 命中率 (%)</label>
-                        <input type="number" class="form-input" id="cardHit" min="0" max="100" value="100" oninput="codex.syncFullCardToJson()">
+                        <input type="number" class="form-input" id="cardHit" min="0" max="100" value="100"
+                            oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">⏱️ 冷却 (秒)</label>
-                        <input type="number" class="form-input" id="cardCooldown" min="0" step="0.1" value="0" oninput="codex.syncFullCardToJson()">
+                        <input type="number" class="form-input" id="cardCooldown" min="0" step="0.1" value="0"
+                            oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <!-- 职业复选框 -->
@@ -1665,9 +1681,9 @@
                             <label class="form-label" style="margin-top: 0.75rem;">
                                 <span>📝</span> 完整卡牌JSON预览 (只读)
                             </label>
-                            <textarea class="form-textarea" id="cardData" rows="12" 
-                                placeholder='{"name": "卡牌名称", "type": "attack", "rarity": "common", "data": {"amount1": 5}}' 
-                                readonly 
+                            <textarea class="form-textarea" id="cardData" rows="12"
+                                placeholder='{"name": "卡牌名称", "type": "attack", "rarity": "common", "data": {"amount1": 5}}'
+                                readonly
                                 style="width: 100%; min-height: 300px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.5; background: rgba(255, 255, 255, 0.03); cursor: not-allowed;"></textarea>
                         </div>
                     </div>
@@ -2213,7 +2229,7 @@
                 if (card.cooldown) previewStats.push(`<span class="preview-stat">⏱️ ${card.cooldown}s</span>`);
 
                 // 高亮匹配的名称
-                const displayName = this.searchQuery 
+                const displayName = this.searchQuery
                     ? this.highlightText(card.name || '未命名', this.searchQuery)
                     : (card.name || '未命名');
 
@@ -2558,15 +2574,31 @@
             }
 
             exportData() {
-                const data = Object.fromEntries(this.cards);
+                const filtered = this.getFilteredCards();
+
+                if (filtered.length === 0) {
+                    this.showToast('当前没有卡牌可导出');
+                    return;
+                }
+
+                const data = Object.fromEntries(filtered);
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
+
+                // 根据是否应用了筛选来命名文件
+                const isFiltered = this.searchQuery || this.hasActiveFilters();
+                const suffix = isFiltered ? '_filtered' : '';
+
                 a.href = url;
-                a.download = `cards_${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `cards${suffix}_${new Date().toISOString().slice(0, 10)}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-                this.showToast('数据已导出');
+
+                const msg = isFiltered
+                    ? `已导出 ${filtered.length} 张筛选后的卡牌`
+                    : `已导出 ${filtered.length} 张卡牌`;
+                this.showToast(msg);
             }
 
             importData() {
@@ -2786,13 +2818,13 @@
             setupRealtimeSubscription() {
                 this.syncChannel = this.supabase
                     .channel('card_codex_changes')
-                    .on('postgres_changes', 
-                        { 
-                            event: '*', 
-                            schema: 'public', 
+                    .on('postgres_changes',
+                        {
+                            event: '*',
+                            schema: 'public',
                             table: 'card_codex_data',
                             filter: `user_id=eq.${this.userId}`
-                        }, 
+                        },
                         (payload) => {
                             console.log('收到云端更新:', payload);
                             this.handleCloudUpdate(payload);
