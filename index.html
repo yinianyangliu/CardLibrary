@@ -2423,11 +2423,11 @@
                     document.getElementById('cardRarity').value = card.rarity || 'common';
                     document.getElementById('cardDesc').value = card.desc || '';
                     document.getElementById('cardGold').value = card.gold || 0;
-                    document.getElementById('cardDamage').value = card.damage || 0;
+                    document.getElementById('cardDamage').value = card.damage || '';
                     document.getElementById('cardMp').value = card.mp || '';
                     document.getElementById('cardAp').value = card.ap || '';
-                    document.getElementById('cardHit').value = card.hit || 100;
-                    document.getElementById('cardCooldown').value = card.cooldown || 0;
+                    document.getElementById('cardHit').value = card.hit || '';
+                    document.getElementById('cardCooldown').value = card.cooldown || '';
                     // 初始化键值对编辑器
                     this.kvData = card.data || {};
                     this.renderKVList();
@@ -2496,11 +2496,11 @@
                     rarity: document.getElementById('cardRarity').value,
                     desc: document.getElementById('cardDesc').value,
                     gold: parseInt(document.getElementById('cardGold').value) || 0,
-                    damage: parseInt(document.getElementById('cardDamage').value) || 0,
+                    damage: document.getElementById('cardDamage').value ? parseInt(document.getElementById('cardDamage').value) : null,
                     mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
                     ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
-                    hit: parseInt(document.getElementById('cardHit').value) || 100,
-                    cooldown: parseFloat(document.getElementById('cardCooldown').value) || 0,
+                    hti: document.getElementById('cardHit').value ? parseInt(document.getElementById('cardHit').value) : null,
+                    cooldown:document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: {}
