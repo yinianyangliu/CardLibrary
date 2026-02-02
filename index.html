@@ -1733,12 +1733,12 @@
         // 稀有度映射 - 7种稀有度（神话为红色）
         const rarityMap = {
             'common': { label: '普通', class: 'rarity-common', color: '#888888' },
-            'special': { label: '特殊', class: 'rarity-special', color: '#00ff88' },
-            'exclusive': { label: '专属', class: 'rarity-exclusive', color: '#ff00ff' },
             'rare': { label: '罕见', class: 'rarity-rare', color: '#0088ff' },
             'epic': { label: '史诗', class: 'rarity-epic', color: '#aa00ff' },
             'legendary': { label: '传说', class: 'rarity-legendary', color: '#ffaa00' },
-            'mythic': { label: '神话', class: 'rarity-mythic', color: '#ff0000' }
+            'mythic': { label: '神话', class: 'rarity-mythic', color: '#ff0000' },
+            'special': { label: '特殊', class: 'rarity-special', color: '#00ff88' },
+            'exclusive': { label: '专属', class: 'rarity-exclusive', color: '#ff00ff' },
         };
 
         // 职业映射 - 10种职业
@@ -1764,7 +1764,7 @@
         const tagMap = {
             'fire': { icon: '🔥', label: '火', color: '#ff4400', glow: 'rgba(255,68,0,0.3)' },
             //光系
-            'light':{icon: '✨', label: '光系', color: '#fffacd', glow: 'rgba(255,250,205,0.3)'  },
+            'light': { icon: '✨', label: '光系', color: '#fffacd', glow: 'rgba(255,250,205,0.3)' },
             'ice': { icon: '❄️', label: '冰', color: '#00ccff', glow: 'rgba(0,204,255,0.3)' },
             'lightning': { icon: '⚡', label: '雷', color: '#ffdd00', glow: 'rgba(255,221,0,0.3)' },
             'poison': { icon: '☠️', label: '毒', color: '#00cc00', glow: 'rgba(0,204,0,0.3)' },
@@ -2504,7 +2504,7 @@
                     mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
                     ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
                     hti: document.getElementById('cardHit').value ? parseInt(document.getElementById('cardHit').value) : null,
-                    cooldown:document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
+                    cooldown: document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: {}
@@ -3137,8 +3137,8 @@
                     damage: document.getElementById('cardDamage').value ? parseInt(document.getElementById('cardDamage').value) : null,
                     mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
                     ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
-                    hit:document.getElementById('cardHit').value ? parseInt(document.getElementById('cardHit').value) : null,
-                    cooldown:document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
+                    hit: document.getElementById('cardHit').value ? parseInt(document.getElementById('cardHit').value) : null,
+                    cooldown: document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: this.kvData
