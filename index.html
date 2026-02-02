@@ -1734,15 +1734,17 @@
         const rarityMap = {
             'common': { label: '普通', class: 'rarity-common', color: '#888888' },
             'special': { label: '特殊', class: 'rarity-special', color: '#00ff88' },
-            'exclusive': { label: '专属', class: 'rarity-exclusive', color: '#ff00ff' },
+            'exclusive': { label: '专属', class: 'rarity-exclusive', color: '#ff0000' },
             'rare': { label: '罕见', class: 'rarity-rare', color: '#0088ff' },
             'epic': { label: '史诗', class: 'rarity-epic', color: '#aa00ff' },
             'legendary': { label: '传说', class: 'rarity-legendary', color: '#ffaa00' },
-            'mythic': { label: '神话', class: 'rarity-mythic', color: '#ff0000' }
+            'mythic': { label: '神话', class: 'rarity-mythic', color: '#ff00ff' }
         };
 
         // 职业映射 - 10种职业
         const careerMap = {
+            //所有可用
+            'all': { icon: '👥', label: '通用', color: '#888888', glow: 'rgba(136,136,136,0.3)' },
             'warrior': { icon: '⚔️', label: '战士', color: '#cc0000', glow: 'rgba(204,0,0,0.3)' },
             'mage': { icon: '🔮', label: '法师', color: '#6600ff', glow: 'rgba(102,0,255,0.3)' },
             'priest': { icon: '✝️', label: '牧师', color: '#ffdd00', glow: 'rgba(255,221,0,0.3)' },
