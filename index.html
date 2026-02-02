@@ -1637,13 +1637,13 @@
 
                     <div class="form-group">
                         <label class="form-label">🎯 命中率 (%)</label>
-                        <input type="number" class="form-input" id="cardHit" min="0" max="100" value="100"
+                        <input type="number" class="form-input" id="cardHit" min="0" placeholder="空为无命中"
                             oninput="codex.syncFullCardToJson()">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">⏱️ 冷却 (秒)</label>
-                        <input type="number" class="form-input" id="cardCooldown" min="0" step="0.1" value="0"
+                        <input type="number" class="form-input" id="cardCooldown" min="0" step="0.1" placeholder="空为无冷却"
                             oninput="codex.syncFullCardToJson()">
                     </div>
 
@@ -3130,11 +3130,11 @@
                     rarity: document.getElementById('cardRarity').value || 'common',
                     desc: document.getElementById('cardDesc').value || '',
                     gold: parseInt(document.getElementById('cardGold').value) || 0,
-                    damage: parseInt(document.getElementById('cardDamage').value) || 0,
+                    damage: document.getElementById('cardDamage').value ? parseInt(document.getElementById('cardDamage').value) : null,
                     mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
                     ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
-                    hit: parseInt(document.getElementById('cardHit').value) || 100,
-                    cooldown: parseFloat(document.getElementById('cardCooldown').value) || 0,
+                    hit:document.getElementById('cardHit').value ? parseInt(document.getElementById('cardHit').value) : null,
+                    cooldown:document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: this.kvData
