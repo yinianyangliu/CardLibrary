@@ -1734,11 +1734,11 @@
         const rarityMap = {
             'common': { label: '普通', class: 'rarity-common', color: '#888888' },
             'special': { label: '特殊', class: 'rarity-special', color: '#00ff88' },
-            'exclusive': { label: '专属', class: 'rarity-exclusive', color: '#ff0000' },
+            'exclusive': { label: '专属', class: 'rarity-exclusive', color: '#ff00ff' },
             'rare': { label: '罕见', class: 'rarity-rare', color: '#0088ff' },
             'epic': { label: '史诗', class: 'rarity-epic', color: '#aa00ff' },
             'legendary': { label: '传说', class: 'rarity-legendary', color: '#ffaa00' },
-            'mythic': { label: '神话', class: 'rarity-mythic', color: '#ff00ff' }
+            'mythic': { label: '神话', class: 'rarity-mythic', color: '#ff0000' }
         };
 
         // 职业映射 - 10种职业
@@ -3145,9 +3145,9 @@
                 // 清理null值，保持简洁
                 if (card.mp === null) delete card.mp;
                 if (card.ap === null) delete card.ap;
-                if (card.damage === 0) delete card.damage;
+                if (card.damage === null) delete card.damage;
                 if (card.gold === 0) delete card.gold;
-                if (card.cooldown === 0) delete card.cooldown;
+                if (card.cooldown === null) delete card.cooldown;
                 if (Object.keys(card.data).length === 0) delete card.data;
                 if (card.career.length === 0) delete card.career;
                 if (card.tag.length === 0) delete card.tag;
