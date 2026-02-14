@@ -2493,6 +2493,11 @@
                     keyInput.focus();
                     return;
                 }
+                const damage = document.getElementById('cardDamage').value;
+                const mp = document.getElementById('cardMp').value;
+                const ap = document.getElementById('cardAp').value;
+                const hit = document.getElementById('cardHit').value;
+                const cooldown = document.getElementById('cardCooldown').value;
 
                 const card = {
                     name: document.getElementById('cardName').value,
@@ -2500,11 +2505,11 @@
                     rarity: document.getElementById('cardRarity').value,
                     desc: document.getElementById('cardDesc').value,
                     gold: parseInt(document.getElementById('cardGold').value) || 0,
-                    damage: document.getElementById('cardDamage').value ?? null,
-                    mp: document.getElementById('cardMp').value ?? null,
-                    ap: document.getElementById('cardAp').value ?? null,
-                    hit: document.getElementById('cardHit').value ?? null,
-                    cooldown: document.getElementById('cardCooldown').value ?? null,
+                    damage: damage === '' ? null : parseInt(damage),
+                    mp: mp === '' ? null : parseInt(mp),
+                    ap: ap === '' ? null : parseInt(ap),
+                    hit: hit === '' ? null : parseInt(hit),
+                    cooldown: cooldown === '' ? null : parseInt(cooldown),
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: {}
