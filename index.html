@@ -1455,7 +1455,7 @@
     </script>
     <base target="_blank">
     <base target="_blank">
-<base target="_blank">
+    <base target="_blank">
 </head>
 
 <body>
@@ -1598,7 +1598,7 @@
                         <select class="form-select" id="cardRarity" onchange="codex.syncFullCardToJson()">
                             <option value="common">⬜ 普通</option>
                             <option value="special">🟢 特殊</option>
-                            <option value="exclusive">🔴  专属</option>
+                            <option value="exclusive">🔴 专属</option>
                             <option value="rare">🔵 罕见</option>
                             <option value="epic">🟣 史诗</option>
                             <option value="legendary">🟨 传说</option>
@@ -2279,11 +2279,11 @@
                 this.tooltip.style.setProperty('--tooltip-glow', rarityInfo.color + '80');
 
                 const stats = [];
-                if (card.gold) stats.push({ icon: '💰', label: '价格', value: card.gold });
-                if (card.damage) stats.push({ icon: '⚔️', label: '伤害', value: card.damage });
-                if (card.hit) stats.push({ icon: '🎯', label: '命中', value: card.hit + '%' });
-                if (card.mp) stats.push({ icon: '💧', label: 'MP', value: card.mp });
-                if (card.ap) stats.push({ icon: '⚡', label: 'AP', value: card.ap });
+                if (card.gold !== null) stats.push({ icon: '💰', label: '价格', value: card.gold });
+                if (card.damage != null) stats.push({ icon: '⚔️', label: '伤害', value: card.damage });
+                if (card.hit != null) stats.push({ icon: '🎯', label: '命中', value: card.hit + '%' });
+                if (card.mp != null) stats.push({ icon: '💧', label: 'MP', value: card.mp });
+                if (card.ap != null) stats.push({ icon: '⚡', label: 'AP', value: card.ap });
 
                 // 使用映射表渲染职业标签 - 独立区块
                 const careerSection = (card.career || []).length > 0 ? `
@@ -3155,7 +3155,7 @@
                 if (card.ap === null) delete card.ap;
                 if (card.damage === null) delete card.damage;
                 if (card.hit === null) delete card.hit;
-                if (card.gold === 0) delete card.gold;
+                if (card.gold === null) delete card.gold;
                 if (card.cooldown === null) delete card.cooldown;
                 if (Object.keys(card.data).length === 0) delete card.data;
                 if (card.career.length === 0) delete card.career;
