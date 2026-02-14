@@ -2511,11 +2511,11 @@
                     rarity: document.getElementById('cardRarity').value,
                     desc: document.getElementById('cardDesc').value,
                     gold: parseInt(document.getElementById('cardGold').value) || 0,
-                    damage: damage === '' ? null : parseInt(damage),
-                    mp: mp === '' ? null : parseInt(mp),
-                    ap: ap === '' ? null : parseInt(ap),
-                    hit: hit === '' ? null : parseInt(hit),
-                    cooldown: cooldown === '' ? null : parseInt(cooldown),
+                    damage: damageValue,
+                    mp: mpValue,
+                    ap: apValue,
+                    hit: hitValue,
+                    cooldown: cooldownValue,
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: {}
@@ -3145,11 +3145,11 @@
                     rarity: document.getElementById('cardRarity').value || 'common',
                     desc: document.getElementById('cardDesc').value || '',
                     gold: parseInt(document.getElementById('cardGold').value) || 0,
-                    damage: document.getElementById('cardDamage').value ? parseInt(document.getElementById('cardDamage').value) : null,
-                    mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
-                    ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
-                    hit: document.getElementById('cardHit').value ? parseInt(document.getElementById('cardHit').value) : null,
-                    cooldown: document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
+                    damage: (() => { const v = document.getElementById('cardDamage').value; return v === '' ? null : parseInt(v); })(),
+                    mp: (() => { const v = document.getElementById('cardMp').value; return v === '' ? null : parseInt(v); })(),
+                    ap: (() => { const v = document.getElementById('cardAp').value; return v === '' ? null : parseInt(v); })(),
+                    hit: (() => { const v = document.getElementById('cardHit').value; return v === '' ? null : parseInt(v); })(),
+                    cooldown: (() => { const v = document.getElementById('cardCooldown').value; return v === '' ? null : parseFloat(v); })(),
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: this.kvData
@@ -3203,11 +3203,11 @@
                 if (card.rarity !== undefined) document.getElementById('cardRarity').value = card.rarity;
                 if (card.desc !== undefined) document.getElementById('cardDesc').value = card.desc;
                 if (card.gold !== undefined) document.getElementById('cardGold').value = card.gold;
-                if (card.damage !== undefined) document.getElementById('cardDamage').value = card.damage;
-                if (card.mp !== undefined) document.getElementById('cardMp').value = card.mp;
-                if (card.ap !== undefined) document.getElementById('cardAp').value = card.ap;
-                if (card.hit !== undefined) document.getElementById('cardHit').value = card.hit;
-                if (card.cooldown !== undefined) document.getElementById('cardCooldown').value = card.cooldown;
+                if (card.damage !== undefined) document.getElementById('cardDamage').value = card.damage === null ? '' : card.damage;
+                if (card.mp !== undefined) document.getElementById('cardMp').value = card.mp === null ? '' : card.mp;
+                if (card.ap !== undefined) document.getElementById('cardAp').value = card.ap === null ? '' : card.ap;
+                if (card.hit !== undefined) document.getElementById('cardHit').value = card.hit === null ? '' : card.hit;
+                if (card.cooldown !== undefined) document.getElementById('cardCooldown').value = card.cooldown === null ? '' : card.cooldown;
 
                 // 同步复选框
                 if (card.career !== undefined) this.setCheckedValues('career', card.career);
