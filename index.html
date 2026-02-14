@@ -2229,9 +2229,9 @@
                 }
 
                 const previewStats = [];
-                if (card.gold) previewStats.push(`<span class="preview-stat">💰 ${card.gold}</span>`);
-                if (card.damage) previewStats.push(`<span class="preview-stat">⚔️ ${card.damage}</span>`);
-                if (card.cooldown) previewStats.push(`<span class="preview-stat">⏱️ ${card.cooldown}s</span>`);
+                if (card.gold != null) previewStats.push(`<span class="preview-stat">💰 ${card.gold}</span>`);
+                if (card.damage != null) previewStats.push(`<span class="preview-stat">⚔️ ${card.damage}</span>`);
+                if (card.cooldown != null) previewStats.push(`<span class="preview-stat">⏱️ ${card.cooldown}s</span>`);
 
                 // 高亮匹配的名称
                 const displayName = this.searchQuery
@@ -2279,11 +2279,11 @@
                 this.tooltip.style.setProperty('--tooltip-glow', rarityInfo.color + '80');
 
                 const stats = [];
-                if (card.gold) stats.push({ icon: '💰', label: '价格', value: card.gold });
-                if (card.damage) stats.push({ icon: '⚔️', label: '伤害', value: card.damage });
-                if (card.hit) stats.push({ icon: '🎯', label: '命中', value: card.hit + '%' });
-                if (card.mp) stats.push({ icon: '💧', label: 'MP', value: card.mp });
-                if (card.ap) stats.push({ icon: '⚡', label: 'AP', value: card.ap });
+                if (card.gold != null) stats.push({ icon: '💰', label: '价格', value: card.gold });
+                if (card.damage != null) stats.push({ icon: '⚔️', label: '伤害', value: card.damage });
+                if (card.hit != null) stats.push({ icon: '🎯', label: '命中', value: card.hit + '%' });
+                if (card.mp != null) stats.push({ icon: '💧', label: 'MP', value: card.mp });
+                if (card.ap != null) stats.push({ icon: '⚡', label: 'AP', value: card.ap });
 
                 // 使用映射表渲染职业标签 - 独立区块
                 const careerSection = (card.career || []).length > 0 ? `
@@ -2495,15 +2495,10 @@
                     return;
                 }
                 const damage = document.getElementById('cardDamage').value;
-                const damageValue = damage === '' ? null : parseInt(damage);
                 const mp = document.getElementById('cardMp').value;
-                const mpValue = mp === '' ? null : parseInt(mp);
                 const ap = document.getElementById('cardAp').value;
-                const apValue = ap === '' ? null : parseInt(ap);
                 const hit = document.getElementById('cardHit').value;
-                const hitValue = hit === '' ? null : parseInt(hit);
                 const cooldown = document.getElementById('cardCooldown').value;
-                const cooldownValue = cooldown === '' ? null : parseFloat(cooldown);
 
                 const card = {
                     name: document.getElementById('cardName').value,
@@ -2511,11 +2506,11 @@
                     rarity: document.getElementById('cardRarity').value,
                     desc: document.getElementById('cardDesc').value,
                     gold: parseInt(document.getElementById('cardGold').value) || 0,
-                    damage: damageValue,
-                    mp: mpValue,
-                    ap: apValue,
-                    hit: hitValue,
-                    cooldown: cooldownValue,
+                    damage: damage === '' ? null : parseInt(damage),
+                    mp: mp === '' ? null : parseInt(mp),
+                    ap: ap === '' ? null : parseInt(ap),
+                    hit: hit === '' ? null : parseInt(hit),
+                    cooldown: cooldown === '' ? null : parseInt(cooldown),
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: {}
@@ -3145,11 +3140,11 @@
                     rarity: document.getElementById('cardRarity').value || 'common',
                     desc: document.getElementById('cardDesc').value || '',
                     gold: parseInt(document.getElementById('cardGold').value) || 0,
-                    damage: (() => { const v = document.getElementById('cardDamage').value; return v === '' ? null : parseInt(v); })(),
-                    mp: (() => { const v = document.getElementById('cardMp').value; return v === '' ? null : parseInt(v); })(),
-                    ap: (() => { const v = document.getElementById('cardAp').value; return v === '' ? null : parseInt(v); })(),
-                    hit: (() => { const v = document.getElementById('cardHit').value; return v === '' ? null : parseInt(v); })(),
-                    cooldown: (() => { const v = document.getElementById('cardCooldown').value; return v === '' ? null : parseFloat(v); })(),
+                    damage: document.getElementById('cardDamage').value ? parseInt(document.getElementById('cardDamage').value) : null,
+                    mp: document.getElementById('cardMp').value ? parseInt(document.getElementById('cardMp').value) : null,
+                    ap: document.getElementById('cardAp').value ? parseInt(document.getElementById('cardAp').value) : null,
+                    hit: document.getElementById('cardHit').value ? parseInt(document.getElementById('cardHit').value) : null,
+                    cooldown: document.getElementById('cardCooldown').value ? parseFloat(document.getElementById('cardCooldown').value) : null,
                     career: this.getCheckedValues('career'),
                     tag: this.getCheckedValues('tag'),
                     data: this.kvData
@@ -3160,7 +3155,7 @@
                 if (card.ap === null) delete card.ap;
                 if (card.damage === null) delete card.damage;
                 if (card.hit === null) delete card.hit;
-                if (card.gold === null) delete card.gold;
+                if (card.gold === 0) delete card.gold;
                 if (card.cooldown === null) delete card.cooldown;
                 if (Object.keys(card.data).length === 0) delete card.data;
                 if (card.career.length === 0) delete card.career;
@@ -3203,11 +3198,11 @@
                 if (card.rarity !== undefined) document.getElementById('cardRarity').value = card.rarity;
                 if (card.desc !== undefined) document.getElementById('cardDesc').value = card.desc;
                 if (card.gold !== undefined) document.getElementById('cardGold').value = card.gold;
-                if (card.damage !== undefined) document.getElementById('cardDamage').value = card.damage === null ? '' : card.damage;
-                if (card.mp !== undefined) document.getElementById('cardMp').value = card.mp === null ? '' : card.mp;
-                if (card.ap !== undefined) document.getElementById('cardAp').value = card.ap === null ? '' : card.ap;
-                if (card.hit !== undefined) document.getElementById('cardHit').value = card.hit === null ? '' : card.hit;
-                if (card.cooldown !== undefined) document.getElementById('cardCooldown').value = card.cooldown === null ? '' : card.cooldown;
+                if (card.damage !== undefined) document.getElementById('cardDamage').value = card.damage;
+                if (card.mp !== undefined) document.getElementById('cardMp').value = card.mp;
+                if (card.ap !== undefined) document.getElementById('cardAp').value = card.ap;
+                if (card.hit !== undefined) document.getElementById('cardHit').value = card.hit;
+                if (card.cooldown !== undefined) document.getElementById('cardCooldown').value = card.cooldown;
 
                 // 同步复选框
                 if (card.career !== undefined) this.setCheckedValues('career', card.career);
