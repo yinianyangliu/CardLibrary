@@ -2229,9 +2229,9 @@
                 }
 
                 const previewStats = [];
-                if (card.gold != null) previewStats.push(`<span class="preview-stat">💰 ${card.gold}</span>`);
-                if (card.damage != null) previewStats.push(`<span class="preview-stat">⚔️ ${card.damage}</span>`);
-                if (card.cooldown != null) previewStats.push(`<span class="preview-stat">⏱️ ${card.cooldown}s</span>`);
+                if (card.gold) previewStats.push(`<span class="preview-stat">💰 ${card.gold}</span>`);
+                if (card.damage) previewStats.push(`<span class="preview-stat">⚔️ ${card.damage}</span>`);
+                if (card.cooldown) previewStats.push(`<span class="preview-stat">⏱️ ${card.cooldown}s</span>`);
 
                 // 高亮匹配的名称
                 const displayName = this.searchQuery
@@ -2279,11 +2279,11 @@
                 this.tooltip.style.setProperty('--tooltip-glow', rarityInfo.color + '80');
 
                 const stats = [];
-                if (card.gold != null) stats.push({ icon: '💰', label: '价格', value: card.gold });
-                if (card.damage != null) stats.push({ icon: '⚔️', label: '伤害', value: card.damage });
-                if (card.hit != null) stats.push({ icon: '🎯', label: '命中', value: card.hit + '%' });
-                if (card.mp != null) stats.push({ icon: '💧', label: 'MP', value: card.mp });
-                if (card.ap != null) stats.push({ icon: '⚡', label: 'AP', value: card.ap });
+                if (card.gold) stats.push({ icon: '💰', label: '价格', value: card.gold });
+                if (card.damage) stats.push({ icon: '⚔️', label: '伤害', value: card.damage });
+                if (card.hit) stats.push({ icon: '🎯', label: '命中', value: card.hit + '%' });
+                if (card.mp) stats.push({ icon: '💧', label: 'MP', value: card.mp });
+                if (card.ap) stats.push({ icon: '⚡', label: 'AP', value: card.ap });
 
                 // 使用映射表渲染职业标签 - 独立区块
                 const careerSection = (card.career || []).length > 0 ? `
@@ -2428,11 +2428,11 @@
                     document.getElementById('cardRarity').value = card.rarity || 'common';
                     document.getElementById('cardDesc').value = card.desc || '';
                     document.getElementById('cardGold').value = card.gold || 0;
-                    document.getElementById('cardDamage').value = card.damage || '';
-                    document.getElementById('cardMp').value = card.mp || '';
-                    document.getElementById('cardAp').value = card.ap || '';
-                    document.getElementById('cardHit').value = card.hit || '';
-                    document.getElementById('cardCooldown').value = card.cooldown || '';
+                    document.getElementById('cardDamage').value = card.damage != null ? card.damage : '';
+                    document.getElementById('cardMp').value = card.mp != null ? card.mp : '';
+                    document.getElementById('cardAp').value = card.ap != null ? card.ap : '';
+                    document.getElementById('cardHit').value = card.hit != null ? card.hit : '';
+                    document.getElementById('cardCooldown').value = card.cooldown != null ? card.cooldown : '';
                     // 初始化键值对编辑器
                     this.kvData = card.data || {};
                     this.renderKVList();
