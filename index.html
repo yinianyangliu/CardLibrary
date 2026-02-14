@@ -1455,6 +1455,7 @@
     </script>
     <base target="_blank">
     <base target="_blank">
+<base target="_blank">
 </head>
 
 <body>
@@ -2494,10 +2495,15 @@
                     return;
                 }
                 const damage = document.getElementById('cardDamage').value;
+                const damageValue = damage === '' ? null : parseInt(damage);
                 const mp = document.getElementById('cardMp').value;
+                const mpValue = mp === '' ? null : parseInt(mp);
                 const ap = document.getElementById('cardAp').value;
+                const apValue = ap === '' ? null : parseInt(ap);
                 const hit = document.getElementById('cardHit').value;
+                const hitValue = hit === '' ? null : parseInt(hit);
                 const cooldown = document.getElementById('cardCooldown').value;
+                const cooldownValue = cooldown === '' ? null : parseFloat(cooldown);
 
                 const card = {
                     name: document.getElementById('cardName').value,
